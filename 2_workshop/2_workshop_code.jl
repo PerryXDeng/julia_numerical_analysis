@@ -8,7 +8,7 @@ Clarissa Xue
 Owen Miller
 ====#
 
-# Question 1
+# Question 1 & 2
 function bisection(f, a, b, tolerance)
     if f(a) == 0 return a end
     if f(b) == 0 return b end
@@ -27,7 +27,7 @@ function bisection(f, a, b, tolerance)
         end
         f(a) * f(x_m) <= 0 ? b = x_m : a = x_m
         counter += 1
-        if counter >= (n + 4)
+        if counter >= (n + 2)
             return string("n=", n, " iterations reached.")
         end
     end
