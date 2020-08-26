@@ -1,7 +1,6 @@
 #====
 Numerical Analysis
 Workshop #2
-
 Contributors:
 Perry Deng
 Clarissa Xue
@@ -106,7 +105,9 @@ tol = 10^-8: x=9.999821965396404, f(x)=-9.55604992e9, n=24.253496664211532 itera
 [15.9, 16.1]
 tol = 10^-8: x=15.990879048407082, f(x)=-7.70704719872e11, n=24.253496664211543 iterations reached.
 Question 3 comments: It appears that both forward and backward errors become larger
-on the later two trials compared to the first trial.
+on the later two trials compared to the first trial. This is due to the computer's
+difficulty to deal with alternating signs of larger numbers. It doesn't know how to
+simplify these into smaller terms, resulting in more errors.
 =#
 using Winston
 xs = range(1, stop=20, step=0.01)
@@ -115,5 +116,6 @@ plot(xs, ys, "b")
 #=
 Question 3 comments: It appears that the function has steep tangents near
 the first two and last two roots, but much smoother tangents otherwise.
-This should cause much larger condition number
+This should cause much larger condition numbers for the smoother tangents since the
+tolerance must be smaller the smaller the slope is near the roots.
 =#
