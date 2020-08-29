@@ -62,3 +62,29 @@ Array{Float64,2}:
 
 # Question 3
 # a)
+
+
+
+
+# Question 4
+function question_4(x, n, threshold)
+    sum = 0
+    for i in 0:n
+        sum += ((3.0*x)^i)/factorial(big(i))
+        println(((3.0*x)^i)/factorial(big(i)))
+        if ((3.0*x)^i)/factorial(big(i)) < threshold && i > 1
+            println("Reached threashold at n=", i)
+            return sum
+        end
+    end
+    return sum
+end
+
+println("sum: ", question_4(2,100, 10.0^-9))
+
+
+
+# Question 5
+# notes:
+# 1 + hv/kt + ((hv/kt)^2)/2
+# then replace v with λ
