@@ -22,7 +22,7 @@ function secant_method(f, x0::Float64, x1::Float64, iter)
     return x2
 end
 
-function false_postition(f, x0::Float64, x1::Float64, iter)
+function false_position(f, x0::Float64, x1::Float64, iter)
     if f(x0) * f(x1) >= 0
         println("Bad x0 & x1: ", x0, " & ", x1)
         return -1
@@ -51,17 +51,17 @@ function f(x::Float64) :: Float64
 end
 max_iter = 9999
 # 2.a
-secant_method(f, 1, 10, max_iter)
-false_position(f, 1, 10, max_iter)
+secant_method(f, 1.0, 10.0, max_iter)
+false_position(f, 1.0, 10.0, max_iter)
 # 2.b
-secant_method(f, 6, 9, max_iter)
-false_position(f, 6, 9, max_iter)
+secant_method(f, 6.0, 9.0, max_iter)
+false_position(f, 6.0, 9.0, max_iter)
 # 2.c
-secant_method(f, 10, 1, max_iter)
-false_position(f, 10, 1, max_iter)
+secant_method(f, 10.0, 1.0, max_iter)
+false_position(f, 10.0, 1.0, max_iter)
 
 # Question 3
-secant_method(f, 4, 5, max_iter)
-false_position(f, 9, 10, max_iter)
+secant_method(f, 4.0, 5.0, max_iter)
+false_position(f, 9.0, 10.0, max_iter)
 
 # Question 4 ??? pen and paper?
