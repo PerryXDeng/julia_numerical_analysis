@@ -189,7 +189,10 @@ False Position Method x0=10.0 x1=1.0
 =#
 #=
 For all cases in the log-log plot, we see a linear relationship that indicates convergence.
-More commentary in pdf of plots.
+For the secant method the slope should be 1.618 around convergence and for false position it
+should be 1. This mostly agrees with our results in the plots. Since we took the average
+which isn't robust against outliers, we plotted a dy/dx vs n. plot to show that it converges
+to the power or alpha.
 =#
 
 # Question 3
