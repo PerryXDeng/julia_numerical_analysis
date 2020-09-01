@@ -9,39 +9,56 @@ Owen Miller
 ====#
 
 # Question 1
-FACC = .00001
+FACC::Float64 = .00001
 function secant_method(f, x0::Float64, x1::Float64, iter)
-    x2 = 0
+    println("Secant Method x0=", x0, " x1=", x1)
+    x2::Float64 = 0.0
     for i in 0:iter
-        x2 = x1 - f(x1) * (x1 - x0) / (float(f(x1) - f(x0)))
+        fx1::Float64 = f(x1)
+        denominator::Float64 = fx1 - f(x0)
+        if denominator == 0.0:
+            println("Singularity")
+            return 1
+        end
+        x2::Float64 = x1 - fx1 * (x1 - x0) / denominator
         x0, x1 = x1, x2
         if abs(f(x2)) < FACC
+            println("Converged")
             break
         end
     end
-    return x2
+    println("Root: ", x2)
+    return 0
 end
 
 function false_position(f, x0::Float64, x1::Float64, iter)
-    if f(x0) * f(x1) >= 0
+    println("False Position Method x0=", x0, " x1=", x1)
+    if f(x0) * f(x1) >= 0.0
         println("Bad x0 & x1: ", x0, " & ", x1)
-        return -1
+        return 1
     end
     x2 = x0
     for i in 0:iter
-        x2 = x1 - f(x1) * (x1 - x0) / (float(f(x1) - f(x0)))
-        if f(x2) == 0
+        fx0::Float64 = f(x0)
+        fx1::Float64 = f(x1)
+        denominator::Float64 = fx1 - fx0
+        if denominator == 0.0:
+            println("Singularity")
+            return 1
+        end
+        x2::Float64 = x1 - fx1 * (x1 - x0) / denominator
+        fx2::Float64 = f(x2)
+        if abs(fx2) < FACC
+            println("Converged")
             break
         elseif f(x2) * f(x0) < 0
             x1 = x2
         else
             x0 = x2
         end
-        if abs(f(x2)) < FACC
-            break
-        end
     end
-    return x2
+    println("Root: ", x2)
+    return 0
 end
 
 
