@@ -67,6 +67,7 @@ function secant_method(f, x0::Float64, x1::Float64, max_iter::Int,
             s = string(s, "\n", info)
             if visualize
                 make_plots(forward_abs_errors, backward_abs_errors, s, question)
+
             end
             return 0
         end
@@ -150,24 +151,47 @@ end
 println()
 secant_method(f, 1.0, 10.0, num_iter, thresh, "Question 2a")
 false_position(f, 1.0, 10.0, num_iter, thresh, "Question 2a")
+#= Output 2a
+Secant Method x0=1.0 x1=10.0
+Singularity, Root: 1.8712868878076563
+False Position Method x0=1.0 x1=10.0
+:) Converged, Root: 6.9999910450421465
+=#
 # 2.b
 println()
 secant_method(f, 6.0, 9.0, num_iter, thresh, "Question 2b")
 false_position(f, 6.0, 9.0, num_iter, thresh, "Question 2b")
 # 2.c
+#= Output 2b
+Secant Method x0=6.0 x1=9.0
+:) Converged, Root: 6.999999068985341
+False Position Method x0=6.0 x1=9.0
+:) Converged, Root: 6.999992411394308
+=#
 println()
 secant_method(f, 10.0, 1.0, num_iter, thresh, "Question 2c")
 false_position(f, 10.0, 1.0, num_iter, thresh, "Question 2c")
+#= Output 2c
+Secant Method x0=10.0 x1=1.0
+Singularity, Root: 1.4470280947235779
+False Position Method x0=10.0 x1=1.0
+:) Converged, Root: 6.999991045042148
+=#
 #=
 For all cases in the log-log plot, we see a linear relationship that indicates convergence.
-More commentary on pdf of plots.
+More commentary in pdf of plots.
 =#
 
 # Question 3
 println()
 secant_method(f, 4.0, 5.0, num_iter, thresh, "Question 3")
 false_position(f, 9.0, 10.0, num_iter, thresh, "Question 3")
-#=
+#= Output 3
+Secant Method x0=4.0 x1=5.0
+:) Converged, Root: 6.999999945795481
+False Position Method x0=9.0 x1=10.0
+Bad x0 & x1: 9.0 & 10.0
+Explanation:
 Although both cases involve an x0 & x1 that are close together, only the first case
 converges, while the second case not only fails to converge but actually breaks during
 its calculations, resulting in an empty plot for all types. When you look at the graph
