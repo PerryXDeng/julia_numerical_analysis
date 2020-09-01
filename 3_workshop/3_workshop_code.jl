@@ -81,4 +81,24 @@ false_position(f, 10.0, 1.0, max_iter)
 secant_method(f, 4.0, 5.0, max_iter)
 false_position(f, 9.0, 10.0, max_iter)
 
-# Question 4 ??? pen and paper?
+# Question 4
+evals = []
+for i in -50.0:1:50.0
+    for j in -50.0:1:50.0
+        if secant_method(f, i, j, max_iter) == 0
+            push!(evals, (i, j, 1.0::Float64))
+        else
+            push!(evals, (i, j, 0.0::Float64))
+        end
+    end
+end
+println(evals)
+
+x = [x[1] for x in evals]
+y = [y[2] for y in evals]
+z = [z[3] for z in evals]
+
+using Plots
+gr()
+
+scatter(x,y,z)
