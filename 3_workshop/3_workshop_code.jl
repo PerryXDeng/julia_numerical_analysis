@@ -40,7 +40,7 @@ function make_plots(forward_abs_errors::Array{Float64},
     display(p)
     p = plot(2:num_iterations-1, dy_dx,
          title=title, legend=false)
-    ylabel!(p, "dy/dx")
+    ylabel!(p, "d ln|f(x_n)| / d ln|f(x_n_minus_one)|")
     xlabel!(p, "n")
     display(p)
 end
