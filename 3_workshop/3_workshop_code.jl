@@ -9,6 +9,7 @@ Owen Miller
 ====#
 
 using Plots
+using Statistics
 
 function make_plots(forward_abs_errors::Array{Float64},
                     backward_abs_errors::Array{Float64},
@@ -28,8 +29,11 @@ function make_plots(forward_abs_errors::Array{Float64},
     log_forward_errors = log.(forward_abs_errors)
     log_errors_n = log_forward_errors[2:num_iterations]
     log_errors_n_minus_one = log_forward_errors[1:(num_iterations-1)]
+    delta_y = log_errors_n[2:end] .- log_errors_n[1:end-1]
+    delta_x = log_errors_n_minus_one[2:end] .- log_errors_n_minus_one[1:end-1]
+    dy_dx_avg = mean(delta_y ./ delta_x)
     p = plot(log_errors_n_minus_one, log_errors_n,
-         title=title, legend=false)
+         title=string(title, ", avg_slope=", dy_dx_avg), legend=false)
     ylabel!(p, "ln|f(x_n)|")
     xlabel!(p, "ln|f(x_n_minus_one)|")
     display(p)
@@ -213,7 +217,7 @@ for i in -50.0:1:50.0
         end
     end
 end
-println(evals)
+#println(evals)
 
 x = [x[1] for x in evals]
 y = [y[2] for y in evals]
