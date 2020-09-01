@@ -158,17 +158,31 @@ false_position(f, 6.0, 9.0, num_iter, thresh, "Question 2b")
 println()
 secant_method(f, 10.0, 1.0, num_iter, thresh, "Question 2c")
 false_position(f, 10.0, 1.0, num_iter, thresh, "Question 2c")
+#=
+For all cases in the log-log plot, we see a linear relationship that indicates convergence.
+More commentary on pdf of plots.
+=#
 
 # Question 3
 println()
 secant_method(f, 4.0, 5.0, num_iter, thresh, "Question 3")
 false_position(f, 9.0, 10.0, num_iter, thresh, "Question 3")
+#=
+Although both cases involve an x0 & x1 that are close together, only the first case
+converges, while the second case not only fails to converge but actually breaks during
+its calculations, resulting in an empty plot for all types. When you look at the graph
+of f(x), you can see that the slope if pretty flat from 0 and starts to increase rapidly
+around x=8 & x=9. Since the algorithm requires taking a slope of the secant line, it is able to converge at
+x0,x1 = 4,5 because there is enough difference in the secant when the function is more flat.
+For x0,x1 = 9,10 the secant line is incredibly steep and following the algorithm becomes steeper
+until the slope is basically dividing by 0, which causes it to break.
+=#
 
 # Question 4
 evals = []
 for i in -50.0:1:50.0
     for j in -50.0:1:50.0
-        if secant_method(f, i, j, max_iter, thresh, "", false) == 0
+        if secant_method(f, i, j, num_iter, thresh, "", false) == 0
             push!(evals, (i, j, 1.0::Float64))
         else
             push!(evals, (i, j, 0.0::Float64))
