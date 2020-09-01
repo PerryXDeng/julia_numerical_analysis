@@ -36,7 +36,8 @@ function make_plots(forward_abs_errors::Array{Float64},
 end
 
 function secant_method(f, x0::Float64, x1::Float64, max_iter::Int,
-                       threshold::Float64, question::String)
+                       threshold::Float64, question::String,
+                       visualize::Bool=true)
     s = string("Secant Method x0=", x0, " x1=", x1)
     println(s)
     x2::Float64 = 0.0
@@ -49,7 +50,9 @@ function secant_method(f, x0::Float64, x1::Float64, max_iter::Int,
             info = string("Singularity, Root: ", x2)
             println(info)
             s = string(s, "\n", info)
-            make_plots(forward_abs_errors, backward_abs_errors, s, question)
+            if visualize
+                make_plots(forward_abs_errors, backward_abs_errors, s, question)
+            end
             return 1
         end
         x2 = x1 - fx1 * (x1 - x0) / denominator
@@ -62,19 +65,24 @@ function secant_method(f, x0::Float64, x1::Float64, max_iter::Int,
             info = string(":) Converged, Root: ", x2)
             println(info)
             s = string(s, "\n", info)
-            make_plots(forward_abs_errors, backward_abs_errors, s, question)
+            if visualize
+                make_plots(forward_abs_errors, backward_abs_errors, s, question)
+            end
             return 0
         end
     end
     info = string("Max iter reached, Root: ", x2)
     println(info)
     s = string(s, "\n", info)
-    make_plots(forward_abs_errors, backward_abs_errors, s, question)
+    if visualize
+        make_plots(forward_abs_errors, backward_abs_errors, s, question)
+    end
     return 1
 end
 
 function false_position(f, x0::Float64, x1::Float64, max_iter::Int,
-                        threshold::Float64, question::String)
+                        threshold::Float64, question::String,
+                        visualize::Bool=true)
     s = string("False Position Method x0=", x0, " x1=", x1)
     println(s)
     forward_abs_errors::Array{Float64} = Float64[] # plot 1, plot 3
@@ -83,7 +91,9 @@ function false_position(f, x0::Float64, x1::Float64, max_iter::Int,
         info = string("Bad x0 & x1: ", x0, " & ", x1)
         println(info)
         s = string(s, "\n", info)
-        make_plots(forward_abs_errors, backward_abs_errors, s, question)
+        if visualize
+            make_plots(forward_abs_errors, backward_abs_errors, s, question)
+        end
         return 1
     end
     x2 = x0
@@ -95,7 +105,9 @@ function false_position(f, x0::Float64, x1::Float64, max_iter::Int,
             info = string("Singularity, Root: ", x2)
             println(info)
             s = string(s, "\n", info)
-            make_plots(forward_abs_errors, backward_abs_errors, s, question)
+            if visualize
+                make_plots(forward_abs_errors, backward_abs_errors, s, question)
+            end
             return 1
         end
         x2::Float64 = x1 - fx1 * (x1 - x0) / denominator
@@ -108,7 +120,9 @@ function false_position(f, x0::Float64, x1::Float64, max_iter::Int,
             info = string(":) Converged, Root: ", x2)
             println(info)
             s = string(s, "\n", info)
-            make_plots(forward_abs_errors, backward_abs_errors, s, question)
+            if visualize
+                make_plots(forward_abs_errors, backward_abs_errors, s, question)
+            end
             return 0
         elseif f(x2) * f(x0) < 0
             x1 = x2
@@ -119,7 +133,9 @@ function false_position(f, x0::Float64, x1::Float64, max_iter::Int,
     info = string("Max iter reached, Root: ", x2)
     println(info)
     s = string(s, "\n", info)
-    make_plots(forward_abs_errors, backward_abs_errors, s, question)
+    if visualize
+        make_plots(forward_abs_errors, backward_abs_errors, s, question)
+    end
     return 1
 end
 
@@ -152,7 +168,7 @@ false_position(f, 9.0, 10.0, num_iter, thresh, "Question 3")
 evals = []
 for i in -50.0:1:50.0
     for j in -50.0:1:50.0
-        if secant_method(f, i, j, max_iter) == 0
+        if secant_method(f, i, j, max_iter, thresh, "", false) == 0
             push!(evals, (i, j, 1.0::Float64))
         else
             push!(evals, (i, j, 0.0::Float64))
