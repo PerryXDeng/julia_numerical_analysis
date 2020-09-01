@@ -9,26 +9,26 @@ Owen Miller
 ====#
 
 # Question 1
-FACC::Float64 = .00001
+FACC = .00001
 function secant_method(f, x0::Float64, x1::Float64, iter)
     println("Secant Method x0=", x0, " x1=", x1)
     x2::Float64 = 0.0
     for i in 0:iter
         fx1::Float64 = f(x1)
         denominator::Float64 = fx1 - f(x0)
-        if denominator == 0.0:
-            println("Singularity")
+        if denominator == 0.0
+            println("Singularity, Root: ", x2)
             return 1
         end
-        x2::Float64 = x1 - fx1 * (x1 - x0) / denominator
+        x2 = x1 - fx1 * (x1 - x0) / denominator
         x0, x1 = x1, x2
         if abs(f(x2)) < FACC
-            println("Converged")
-            break
+            println("Converged, Root: ", x2)
+            return 0
         end
     end
-    println("Root: ", x2)
-    return 0
+    println("Max Iteration, Root: ", x2)
+    return 1
 end
 
 function false_position(f, x0::Float64, x1::Float64, iter)
@@ -42,23 +42,23 @@ function false_position(f, x0::Float64, x1::Float64, iter)
         fx0::Float64 = f(x0)
         fx1::Float64 = f(x1)
         denominator::Float64 = fx1 - fx0
-        if denominator == 0.0:
-            println("Singularity")
+        if denominator == 0.0
+            println("Singularity, Root: ", x2)
             return 1
         end
         x2::Float64 = x1 - fx1 * (x1 - x0) / denominator
         fx2::Float64 = f(x2)
         if abs(fx2) < FACC
-            println("Converged")
-            break
+            println("Converged, Root: ", x2)
+            return 0
         elseif f(x2) * f(x0) < 0
             x1 = x2
         else
             x0 = x2
         end
     end
-    println("Root: ", x2)
-    return 0
+    println("Max Iteration, Root: ", x2)
+    return 1
 end
 
 
