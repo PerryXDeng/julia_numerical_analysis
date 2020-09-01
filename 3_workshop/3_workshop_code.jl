@@ -31,11 +31,17 @@ function make_plots(forward_abs_errors::Array{Float64},
     log_errors_n_minus_one = log_forward_errors[1:(num_iterations-1)]
     delta_y = log_errors_n[2:end] .- log_errors_n[1:end-1]
     delta_x = log_errors_n_minus_one[2:end] .- log_errors_n_minus_one[1:end-1]
-    dy_dx_avg = mean(delta_y ./ delta_x)
+    dy_dx = delta_y ./ delta_x
+    dy_dx_avg = mean(dy_dx)
     p = plot(log_errors_n_minus_one, log_errors_n,
          title=string(title, ", avg_slope=", dy_dx_avg), legend=false)
     ylabel!(p, "ln|f(x_n)|")
     xlabel!(p, "ln|f(x_n_minus_one)|")
+    display(p)
+    p = plot(2:num_iterations-1, dy_dx,
+         title=title, legend=false)
+    ylabel!(p, "dy/dx")
+    xlabel!(p, "n")
     display(p)
 end
 
