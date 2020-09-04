@@ -96,3 +96,33 @@ step=6   xold,new= 6.14572605213819e28, 6.14572605213819e28  diff=6.145726052138
 Description:
 Our initial value of 2.0 cause the values to explode and go beyond our limits.
 =#
+
+
+# Question 3
+function g_alpha(alpha)
+    return function g(x)
+        return alpha*(x^2 - x - 1) + x
+    end
+end
+
+fpi(g_alpha(.5), 1)
+#= - Output -
+step=0   xold,new= 0.5, 0.5  diff=-0.5
+step=1   xold,new= -0.125, -0.125  diff=-0.625
+step=2   xold,new= -0.5546875, -0.5546875  diff=-0.4296875
+step=3   xold,new= -0.623504638671875, -0.623504638671875  diff=-0.068817138671875
+step=4   xold,new= -0.6173733021132648, -0.6173733021132648  diff=0.006131336558610201
+step=5   xold,new= -0.6181117539755141, -0.6181117539755141  diff=-0.0007384518622493008
+step=6   xold,new= -0.6180248067864138, -0.6180248067864138  diff=8.694718910029486e-5
+step=7   xold,new= -0.6180350724915149, -0.6180350724915149  diff=-1.0265705101097922e-5
+step=8   xold,new= -0.6180338608309615, -0.6180338608309615  diff=1.2116605534462366e-6
+step=9   xold,new= -0.6180340038486686, -0.6180340038486686  diff=-1.4301770712155104e-7
+step=10   xold,new= -0.6180339869677263, -0.6180339869677263  diff=1.6880942310670832e-8
+step=11   xold,new= -0.6180339889602513, -0.6180339889602513  diff=-1.992525033855941e-9
+step=12   xold,new= -0.6180339887250657, -0.6180339887250657  diff=2.351856487337045e-10
+step=13   xold,new= -0.6180339887528256, -0.6180339887528256  diff=-2.7759905485424952e-11
+
+Description:
+It looks like we found the other root!
+
+=#
