@@ -28,6 +28,29 @@ function fpi(func, xold)
     end
 end
 
+using Plots
+plotly()
+function fpi_plot(func, xold)
+    diff = 10*FACC
+    step = 0
+    x = []
+    y = []
+    while step < max_iter && abs(diff) > FACC && abs(diff) < MAXACC
+        xnew = func(xold)
+        diff = xnew-xold
+        xold = xnew
+        println("step=", step, "   xold,new= ", xold, ", ", xnew, "  diff=", diff)
+        step += 1
+
+        push!(x, step)
+        push!(y, abs(diff))
+    end
+    println(x)
+    println(y)
+    plot(x, y, yaxis=:log)
+    xaxis!("steps")
+    yaxis!("log| x_n - x_n+1 |")
+end
 
 # Question 2
 function g(x)
@@ -124,5 +147,57 @@ step=13   xold,new= -0.6180339887528256, -0.6180339887528256  diff=-2.7759905485
 
 Description:
 It looks like we found the other root!
+=#
 
+fpi(g_alpha(.5), 2)
+fpi(g_alpha(.5), -1)
+#= - Output -
+2 :
+step=0   xold,new= 2.5, 2.5  diff=0.5
+step=1   xold,new= 3.875, 3.875  diff=1.375
+step=2   xold,new= 8.9453125, 8.9453125  diff=5.0703125
+step=3   xold,new= 43.981964111328125, 43.981964111328125  diff=35.036651611328125
+step=4   xold,new= 988.6975656007417, 988.6975656007417  diff=944.7156014894135
+step=5   xold,new= 489255.2868952168, 489255.2868952168  diff=488266.58932961605
+step=6   xold,new= 1.196856125046039e11, 1.196856125046039e11  diff=1.19685123249317e11
+step=7   xold,new= 7.16232292036094e21, 7.16232292036094e21  diff=7.162322920241255e21
+
+-1 :
+step=0   xold,new= -0.5, -0.5  diff=0.5
+step=1   xold,new= -0.625, -0.625  diff=-0.125
+step=2   xold,new= -0.6171875, -0.6171875  diff=0.0078125
+step=3   xold,new= -0.618133544921875, -0.618133544921875  diff=-0.000946044921875
+step=4   xold,new= -0.6180222327820957, -0.6180222327820957  diff=0.0001113121397793293
+step=5   xold,new= -0.6180353762845644, -0.6180353762845644  diff=-1.3143502468726531e-5
+step=6   xold,new= -0.6180338249726807, -0.6180338249726807  diff=1.5513118837295892e-6
+step=7   xold,new= -0.6180340080811593, -0.6180340080811593  diff=-1.8310847860192325e-7
+step=8   xold,new= -0.6180339864681484, -0.6180339864681484  diff=2.161301082548306e-8
+step=9   xold,new= -0.6180339890192185, -0.6180339890192185  diff=-2.551070021894475e-9
+step=10   xold,new= -0.6180339887181056, -0.6180339887181056  diff=3.0111291238199556e-10
+step=11   xold,new= -0.618033988753647, -0.618033988753647  diff=-3.5541458665022674e-11
+
+Description:
+It looks as though if our initial guess is close enough to the negative root
+we will get convergence to it.
+=#
+
+fpi_plot(g_alpha(-0.5), 1.0)
+title!("FPI: α=-.05 & x_0 = 1")
+#= - Output -
+step=0   xold,new= 1.5, 1.5  diff=0.5
+step=1   xold,new= 1.625, 1.625  diff=0.125
+step=2   xold,new= 1.6171875, 1.6171875  diff=-0.0078125
+step=3   xold,new= 1.618133544921875, 1.618133544921875  diff=0.000946044921875
+step=4   xold,new= 1.6180222327820957, 1.6180222327820957  diff=-0.0001113121397793293
+step=5   xold,new= 1.6180353762845645, 1.6180353762845645  diff=1.3143502468837553e-5
+step=6   xold,new= 1.6180338249726804, 1.6180338249726804  diff=-1.551311884062656e-6
+step=7   xold,new= 1.6180340080811593, 1.6180340080811593  diff=1.8310847882396786e-7
+step=8   xold,new= 1.6180339864681486, 1.6180339864681486  diff=-2.1613010714460756e-8
+step=9   xold,new= 1.6180339890192184, 1.6180339890192184  diff=2.55106979984987e-9
+step=10   xold,new= 1.6180339887181057, 1.6180339887181057  diff=-3.0111269033739063e-10
+step=11   xold,new= 1.618033988753647, 1.618033988753647  diff=3.554134764272021e-11
+
+Description:
+Houston... we have convergence!
+The convergence is linear, as can be seen in the plot fpi_1.png
 =#
