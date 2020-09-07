@@ -203,6 +203,12 @@ Houston... we have convergence!
 The convergence is linear, as can be seen in the plot fpi_1.png
 =#
 
+#= Part 3
+Using f'(r) = 2ϕ - 1 ≈ 2.24 we shoudl get the fastest convergence at
+α = -1/f'(r) ≈ -.447
+=#
+
+
 
 # ========= Question 4 ==========
 function g_beta(β)
@@ -279,4 +285,8 @@ step=17   xold,new= 1.618033708119832, 1.618033708119832  diff=-8.52513067695071
 
 Description:
 It looks like we have linear convergence based on fpi_2.png.
+=#
+
+#= Part 3
+We shoudlget β = -2ϕ ≈ -3.236
 =#
