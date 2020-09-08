@@ -596,8 +596,8 @@ h = 6.6261e-34 #= Planck's Constant =#
 t1 = 500.0
 t2 = 1000.0
 t3 = 5000.0
-min_lambda = 1500e-9
-max_lambda = 1e-9
+max_lambda = 1500e-9
+min_lambda = 1e-9
 min_nu = 1.9986e14
 max_nu = 2.9979e17
 
@@ -625,8 +625,19 @@ function f_lambda3(lambda::Float64) :: Float64
     return ((8 * pi * h * c)/lambda^5) * (1/exp((h*c)/lambda*k*t3)-1)
 end
 
-function plot_lambda(min::Float64, max::Float64)
+function plot_lambda(min, max)
     p = plot([f_lambda1, f_lambda2, f_lambda3], min, max)
     gr()
     display(p)
+end
+
+plot_lambda(min_lambda, max_lambda)
+
+#= 4iv. =#
+v = 2.083e13
+T = 1000
+
+function partial(x::Float64) :: Float64
+    constant = (8pi*h*T^3*v^3)/c^3
+    return constant * ((3x^2*exp(x)-1)-x^3*exp(x))/(exp(x)-1)^2
 end
