@@ -588,3 +588,45 @@ By looking at a plot of the equation 𝝮1(x) - 𝝮2(x) = 0, the slope of the s
 line for the points x0 & x1 result in a very steep slope which means the run is
 close to 0. More visual explanation in attached document.
 =#
+
+# ============= Question 4 =============
+k = 1.3807e-23  #= Boltzmann's Constant =#
+c = 2.9979e8    #= Speed of light in m/s =#
+h = 6.6261e-34 #= Planck's Constant =#
+t1 = 500.0
+t2 = 1000.0
+t3 = 5000.0
+min_lambda = 1500e-9
+max_lambda = 1e-9
+min_nu = 1.9986e14
+max_nu = 2.9979e17
+
+function f_nu1(nu::Float64) :: Float64
+    return ((8 * pi * h * nu^3)/c^3) * (1/exp((h*nu)/k*t1)-1)
+end
+
+function f_nu2(nu::Float64) :: Float64
+    return ((8 * pi * h * nu^3)/c^3) * (1/exp((h*nu)/k*t2)-1)
+end
+
+function f_nu3(nu::Float64) :: Float64
+    return ((8 * pi * h * nu^3)/c^3) * (1/exp((h*nu)/k*t3)-1)
+end
+
+function f_lambda1(lambda::Float64) :: Float64
+    return ((8 * pi * h * c)/lambda^5) * (1/exp((h*c)/lambda*k*t1)-1)
+end
+
+function f_lambda2(lambda::Float64) :: Float64
+    return ((8 * pi * h * c)/lambda^5) * (1/exp((h*c)/lambda*k*t2)-1)
+end
+
+function f_lambda3(lambda::Float64) :: Float64
+    return ((8 * pi * h * c)/lambda^5) * (1/exp((h*c)/lambda*k*t3)-1)
+end
+
+function plot_lambda(min::Float64, max::Float64)
+    p = plot([f_lambda1, f_lambda2, f_lambda3], min, max)
+    gr()
+    display(p)
+end
