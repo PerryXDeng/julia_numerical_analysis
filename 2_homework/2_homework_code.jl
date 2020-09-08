@@ -596,8 +596,8 @@ h = 6.6261e-34 #= Planck's Constant =#
 t1 = 500.0
 t2 = 1000.0
 t3 = 5000.0
-min_lambda = 1500e-9
-max_lambda = 1e-9
+max_lambda = 1500e-9
+min_lambda = 1e-9
 min_nu = 1.9986e14
 max_nu = 2.9979e17
 
@@ -645,7 +645,17 @@ plot_func_over_variable_with_temps(f_nu, nu_vars, "nu", "linear")
 plot_func_over_variable_with_temps(f_nu, nu_vars, "nu", "semilog")
 plot_func_over_variable_with_temps(f_nu, nu_vars, "nu", "loglog")
 
-f(x)::Float64 = x^2
-g(x) = 2*x
-t = 1:100
-plot(t,[f,g], titile="tit", label=["f(x)" "g(x)"])
+# test plots
+# f(x)::Float64 = x^2
+# g(x) = 2*x
+# t = 1:100
+# plot(t,[f,g], titile="tit", label=["f(x)" "g(x)"])
+
+#= 4iv. =#
+v = 2.083e13
+T = 1000
+
+function partial(x::Float64) :: Float64
+    constant = (8pi*h*T^3*v^3)/c^3
+    return constant * ((3x^2*exp(x)-1)-x^3*exp(x))/(exp(x)-1)^2
+end
