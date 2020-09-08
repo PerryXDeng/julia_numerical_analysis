@@ -72,7 +72,7 @@ end
 
 function secant_method(f, x0::Float64, x1::Float64, max_iter::Int,
                        threshold::Float64, question::String,
-                       visualize::Bool=false)
+                       visualize::Bool=true)
     s = string("Secant Method x0=", x0, " x1=", x1)
     println(s)
     x2::Float64 = 0.0
@@ -559,4 +559,30 @@ large gradient when far away from root leads to divergence
 Output:
 step=0   xold,xnew= 2000.0, 420.69  diff=1.0e-9
 step=1   xold,xnew= -7.67998975950256e14, -7.67998975950256e14  diff=-7.67998975952256e14
+=#
+
+# ============= Question 3 =============
+thresh = .00001
+num_iter = 9999
+x0 = -1.0
+x1 = 1.0
+
+function q3_f(x::Float64) :: Float64
+    omega1 = 1 / (1.0x^2 + 1.5x - 0.25)
+    omega2 = 1.0 / (4.0x^2 - 6.4x + 1.5)
+    return omega1 - omega2
+end
+
+secant_method(q3_f, x0, x1, num_iter, thresh, "Question 3")
+#=
+OUTPUT
+Secant Method x0=-1.0 x1=1.0
+:) Converged, Root: -314.5873865107352
+
+EXPLANATION
+Solving this by hand numerically yields the roots x ~ 2.4, -0.2 within the specified
+domain of -1 ⪯ x ⪯ 1, which are not the roots that the Secant Method found.
+By looking at a plot of the equation 𝝮1(x) - 𝝮2(x) = 0, the slope of the secant
+line for the points x0 & x1 result in a very steep slope which means the run is
+close to 0. More visual explanation in attached document.
 =#
