@@ -639,5 +639,13 @@ T = 1000
 
 function partial(x::Float64) :: Float64
     constant = (8pi*h*T^3*v^3)/c^3
-    return constant * ((3x^2*exp(x)-1)-x^3*exp(x))/(exp(x)-1)^2
+    return constant * ((3x^2*exp(x)-1)-x^3*exp(x))/((exp(x)-1)^2)
 end
+
+fpi(partial, 0.0)
+#=
+OUTPUT
+Used Fixed Point Iteration
+step=0   xold,xnew= 0.0, 420.69  diff=1.0e-9
+x_max = 420.69??
+=#
