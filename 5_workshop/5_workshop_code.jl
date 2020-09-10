@@ -103,6 +103,147 @@ step: 42, [-1.0000000022336692]
 step: 43, [-1.0]
 step: 44, [-1.0]
 CONVERGENCE
+=#
+# ========== Question 2 ===========
+#= PART 1
+golden ratio = 1.61803 =#
+
+function q2_f1(x::Vector)
+    return x[1]^2 - x[1] - 1
+end
+
+println("Initial Guess: 1.5")
+newton_method(q2_f1, [1.5], 50)
+println("Initial Guess: 0.0")
+newton_method(q2_f1, [0.0], 50)
+println("Initial Guess: 1.0")
+newton_method(q2_f1, [1.0], 50)
+println("Initial Guess: 0.5")
+newton_method(q2_f1, [0.5], 50)
+println("Initial Guess: 0.49")
+newton_method(q2_f1, [0.49], 50)
+println("Initial Guess: 0.51")
+newton_method(q2_f1, [0.51], 50)
+#= OUTPUT
+Initial Guess: 1.5
+step: 0, [1.5]
+step: 1, [1.625]
+step: 2, [1.6180555555555556]
+step: 3, [1.6180339889579018]
+step: 4, [1.618033988749895]
+CONVERGENCE
+
+Initial Guess: 0.0
+step: 0, [0.0]
+step: 1, [-1.0]
+step: 2, [-0.6666666666666667]
+step: 3, [-0.6190476190476191]
+step: 4, [-0.6180344478216819]
+step: 5, [-0.6180339887499892]
+step: 6, [-0.6180339887498948]
+CONVERGENCE
+
+Initial Guess: 1.0
+step: 0, [1.0]
+step: 1, [2.0]
+step: 2, [1.6666666666666667]
+step: 3, [1.619047619047619]
+step: 4, [1.618034447821682]
+step: 5, [1.618033988749989]
+step: 6, [1.618033988749895]
+CONVERGENCE
+
+Initial Guess: 0.5
+step: 0, [0.5]
+step: 1, [Inf]
+step: 2, [NaN]
+step: 3, [NaN]
+step: 4, [NaN]
+step: 5, [NaN]
+step: 6, [NaN]
+step: 7, [NaN]
+step: 8, [NaN]
+step: 9, [NaN]
+step: 10, [NaN]
+step: 11, [NaN]
+step: 12, [NaN]
+step: 13, [NaN]
+step: 14, [NaN]
+step: 15, [NaN]
+step: 16, [NaN]
+step: 17, [NaN]
+step: 18, [NaN]
+step: 19, [NaN]
+step: 20, [NaN]
+step: 21, [NaN]
+step: 22, [NaN]
+step: 23, [NaN]
+step: 24, [NaN]
+step: 25, [NaN]
+step: 26, [NaN]
+step: 27, [NaN]
+step: 28, [NaN]
+step: 29, [NaN]
+step: 30, [NaN]
+step: 31, [NaN]
+step: 32, [NaN]
+step: 33, [NaN]
+step: 34, [NaN]
+step: 35, [NaN]
+step: 36, [NaN]
+step: 37, [NaN]
+step: 38, [NaN]
+step: 39, [NaN]
+step: 40, [NaN]
+step: 41, [NaN]
+step: 42, [NaN]
+step: 43, [NaN]
+step: 44, [NaN]
+step: 45, [NaN]
+step: 46, [NaN]
+step: 47, [NaN]
+step: 48, [NaN]
+step: 49, [NaN]
+step: 50, [NaN]
+Initial Guess: 0.49
+step: 0, [0.49]
+step: 1, [-62.004999999999946]
+step: 2, [-30.762499200063967]
+step: 3, [-15.151241603742253]
+step: 4, [-7.365553736000171]
+step: 5, [-3.512237262141112]
+step: 6, [-1.6618920709659004]
+step: 7, [-0.8700446488659763]
+step: 8, [-0.6412118365903691]
+step: 9, [-0.618269358123613]
+step: 10, [-0.618034013519751]
+step: 11, [-0.6180339887498951]
+step: 12, [-0.6180339887498948]
+CONVERGENCE
+
+Initial Guess: 0.51
+step: 0, [0.51]
+step: 1, [63.004999999999946]
+step: 2, [31.76249920006397]
+step: 3, [16.151241603742257]
+step: 4, [8.365553736000173]
+step: 5, [4.512237262141113]
+step: 6, [2.6618920709659006]
+step: 7, [1.870044648865976]
+step: 8, [1.6412118365903692]
+step: 9, [1.6182693581236132]
+step: 10, [1.6180340135197508]
+step: 11, [1.6180339887498951]
+step: 12, [1.618033988749895]
+CONVERGENCE
+
+EXPLANATION: It did converge at the golden ratio! We also found another root
+at -0.61803. After some other tries of initial guess between 0.0 and 1.5, we found
+that the dividing line is 0.5. Less than 0.5 yields the negative root, and more
+than 0.5 yields the positive root. =#
+
+#= PART 2 =#
+function
 # ========== Question 3 ===========
 
 # x_new function
