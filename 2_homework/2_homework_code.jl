@@ -601,37 +601,55 @@ min_lambda = 1e-9
 min_nu = 1.9986e14
 max_nu = 2.9979e17
 
-function f_nu1(nu::Float64) :: Float64
-    return ((8 * pi * h * nu^3)/c^3) * (1/exp((h*nu)/k*t1)-1)
+function f_nu(nu::Float64, t::Float64)::Float64
+    ((8 * pi * h * nu^3)/c^3) * (1/exp((h*nu)/k*t)-1)
 end
 
-function f_nu2(nu::Float64) :: Float64
-    return ((8 * pi * h * nu^3)/c^3) * (1/exp((h*nu)/k*t2)-1)
+function f_lambda(lambda::Float64, t::Float64)::Float64
+    return ((8 * pi * h * c)/lambda^5) * (1/exp((h*c)/lambda*k*t)-1)
 end
 
-function f_nu3(nu::Float64) :: Float64
-    return ((8 * pi * h * nu^3)/c^3) * (1/exp((h*nu)/k*t3)-1)
-end
-
-function f_lambda1(lambda::Float64) :: Float64
-    return ((8 * pi * h * c)/lambda^5) * (1/exp((h*c)/lambda*k*t1)-1)
-end
-
-function f_lambda2(lambda::Float64) :: Float64
-    return ((8 * pi * h * c)/lambda^5) * (1/exp((h*c)/lambda*k*t2)-1)
-end
-
-function f_lambda3(lambda::Float64) :: Float64
-    return ((8 * pi * h * c)/lambda^5) * (1/exp((h*c)/lambda*k*t3)-1)
-end
-
-function plot_lambda(min, max)
-    p = plot([f_lambda1, f_lambda2, f_lambda3], min, max)
-    gr()
+function plot_func_over_variable_with_temps(func, var_vals::Array{Float64},
+                                            var_name::String, type::String)
+    plotted_func(func, t) = 0
+    if type == "loglog"
+        var_vals = log.(var_vals)
+    end
+    functions_to_call = []
+    functions_label = []
+    for t in [t1, t2, t3]
+        if type == "linear"
+            push!(functions_to_call, (x->func(x, t)))
+        elseif type == "semilog"
+            push!(functions_to_call, (x->log(func(x, t))))
+        elseif type == "loglog"
+            push!(functions_to_call, (x->log(func(exp(x), t))))
+        else
+            println("????")
+        end
+        push!(functions_label, string("temp=", t))
+    end
+    title = string("u(", var_name, ",T) vs. ", var_name, ", ", type)
+    p = plot(var_vals, functions_to_call,
+             title=title, label=permutedims(functions_label))
     display(p)
 end
 
-plot_lambda(min_lambda, max_lambda)
+lambda_vars = collect(range(min_lambda, stop=max_lambda, length=42069))
+plot_func_over_variable_with_temps(f_lambda, lambda_vars, "lambda", "linear")
+plot_func_over_variable_with_temps(f_lambda, lambda_vars, "lambda", "semilog")
+plot_func_over_variable_with_temps(f_lambda, lambda_vars, "lambda", "loglog")
+nu_vars = collect(range(min_nu, stop=max_nu, length=42069))
+plot_func_over_variable_with_temps(f_nu, nu_vars, "nu", "linear")
+# following two lines break code
+plot_func_over_variable_with_temps(f_nu, nu_vars, "nu", "semilog")
+plot_func_over_variable_with_temps(f_nu, nu_vars, "nu", "loglog")
+
+# test plots
+# f(x)::Float64 = x^2
+# g(x) = 2*x
+# t = 1:100
+# plot(t,[f,g], titile="tit", label=["f(x)" "g(x)"])
 
 #= 4iv. =#
 v = 2.083e13
