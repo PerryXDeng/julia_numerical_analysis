@@ -21,7 +21,7 @@ function newton_method(f, x::Vector, num_iter::Int64;
         x = [x[1] - f_x/f_prime(x)] # conversion between scalar and vector gets complicated
         println(i, ", ", x)
         if abs(f_x) < forward_err_threshold
-            println("CONVERENCE")
+            println("CONVERGENCE")
             break
         end
     end
