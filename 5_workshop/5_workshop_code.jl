@@ -15,11 +15,11 @@ using ForwardDiff # for efficient differentiation with automatic chainrule
 function newton_method(f, x::Vector, num_iter::Int64;
                        forward_err_threshold::Float64=1e-8)
     f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
+    f_2prime = (x_in -> ForwardDiff.gradient(f_prime, x_in)[1])
     println("step:", 0, ", ", x)
     for i in 1:num_iter
         f_x = f(x)
         x = [x[1] - f_x/f_prime(x)] # conversion between scalar and vector gets complicated
-
         println("step:",i, ", ", x, " error:", abs(f_x))
         if abs(f_x) < forward_err_threshold
             println("CONVERGENCE")
@@ -244,13 +244,16 @@ that the dividing line is 0.5. Less than 0.5 yields the negative root, and more
 than 0.5 yields the positive root. =#
 
 #= PART 2 =#
-n = 7 # value between 3 & 8
 function q2_f2(x::Vector)
-    return (x[1]-1)^n
+    return (x[1]-1)^5
 end
 
-println("n = 7")
+println("n = 5")
 newton_method(q2_f2, [1.5], 50)
+
+
+
+
 
 #= OUTPUT
 n = 5
@@ -270,6 +273,7 @@ step:12, [1.034359738368] error:1.4615016373309154e-7
 step:13, [1.0274877906944] error:4.789048565205975e-8
 step:14, [1.02199023255552] error:1.5692754338466684e-8
 step:15, [1.017592186044416] error:5.14220174162866e-9
+Asymptotic Error Constant: 113.68683772161651
 
 n = 7
 step:0, [1.5]
@@ -288,10 +292,13 @@ step:12, [1.034359738368] error:1.4615016373309154e-7
 step:13, [1.0274877906944] error:4.789048565205975e-8
 step:14, [1.02199023255552] error:1.5692754338466684e-8
 step:15, [1.017592186044416] error:5.14220174162866e-9
+Asymptotic Error Constant: 51.92856306243315
 
 EXPLANATION
 For both initial guesses of 5 and 7, we can see that Newton's Method ends up bouncing
 back and forth and fails to quadratically converge.
+
+I don't really get the Asympototic Error Constant and its relationship to n.
 =#
 
 
