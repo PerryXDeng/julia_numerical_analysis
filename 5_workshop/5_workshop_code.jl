@@ -6,8 +6,8 @@ Owen Miller
 Perry Deng
 Clarissa Xue
 =#
-using Plots
-using Statistics
+#using Plots
+#using Statistics
 
 # ========== Question 1 ===========
 using ForwardDiff # for efficient differentiation with automatic chainrule
@@ -15,13 +15,30 @@ using ForwardDiff # for efficient differentiation with automatic chainrule
 function newton_method(f, x::Vector, num_iter::Int64;
                        forward_err_threshold::Float64=1e-8)
     f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
-    f_2prime = (x_in -> ForwardDiff.gradient(f_prime, x_in)[1])
-    println("step:", 0, ", ", x)
+    #f_2prime = (x_in -> ForwardDiff.gradient(f_prime, x_in)[1])
+    f_x = f(x)
+    f_prime_x = f_prime(x)
+    err = abs(f_x)
+    println("step:", 0, ", ", x, " error:", err)
     for i in 1:num_iter
+        x = [x[1] - f_x/f_prime_x] # conversion between scalar and vector gets complicated
         f_x = f(x)
-        x = [x[1] - f_x/f_prime(x)] # conversion between scalar and vector gets complicated
-        println("step:",i, ", ", x, " error:", abs(f_x))
-        if abs(f_x) < forward_err_threshold
+        err = abs(f_x)
+        f_prime_x = f_prime(x)
+        println("step:",i, ", ", x, " error:", err)
+        if iszero(f_prime_x)
+            println("SINGULARITY")
+            break
+        end
+        if isinf(x[1])
+            println("SINGULARITY")
+            break
+        end
+        if isinf(err) || isnan(err)
+            println("DIVERGENCE/ERROR")
+            break
+        end
+        if err < forward_err_threshold
             println("CONVERGENCE")
             break
         end
@@ -154,57 +171,9 @@ step:6, [1.618033988749895] error:2.1049828546892968e-13
 CONVERGENCE
 
 Initial Guess: 0.5
-step:0, [0.5]
-step:1, [Inf] error:1.25
-step:2, [NaN] error:NaN
-step:3, [NaN] error:NaN
-step:4, [NaN] error:NaN
-step:5, [NaN] error:NaN
-step:6, [NaN] error:NaN
-step:7, [NaN] error:NaN
-step:8, [NaN] error:NaN
-step:9, [NaN] error:NaN
-step:10, [NaN] error:NaN
-step:11, [NaN] error:NaN
-step:12, [NaN] error:NaN
-step:13, [NaN] error:NaN
-step:14, [NaN] error:NaN
-step:15, [NaN] error:NaN
-step:16, [NaN] error:NaN
-step:17, [NaN] error:NaN
-step:18, [NaN] error:NaN
-step:19, [NaN] error:NaN
-step:20, [NaN] error:NaN
-step:21, [NaN] error:NaN
-step:22, [NaN] error:NaN
-step:23, [NaN] error:NaN
-step:24, [NaN] error:NaN
-step:25, [NaN] error:NaN
-step:26, [NaN] error:NaN
-step:27, [NaN] error:NaN
-step:28, [NaN] error:NaN
-step:29, [NaN] error:NaN
-step:30, [NaN] error:NaN
-step:31, [NaN] error:NaN
-step:32, [NaN] error:NaN
-step:33, [NaN] error:NaN
-step:34, [NaN] error:NaN
-step:35, [NaN] error:NaN
-step:36, [NaN] error:NaN
-step:37, [NaN] error:NaN
-step:38, [NaN] error:NaN
-step:39, [NaN] error:NaN
-step:40, [NaN] error:NaN
-step:41, [NaN] error:NaN
-step:42, [NaN] error:NaN
-step:43, [NaN] error:NaN
-step:44, [NaN] error:NaN
-step:45, [NaN] error:NaN
-step:46, [NaN] error:NaN
-step:47, [NaN] error:NaN
-step:48, [NaN] error:NaN
-step:49, [NaN] error:NaN
-step:50, [NaN] error:NaN
+step:0, [0.5] error:1.25
+step:1, [Inf] error:NaN
+SINGULARITY
 
 Initial Guess: 0.49
 step:0, [0.49]
@@ -241,7 +210,7 @@ CONVERGENCE
 EXPLANATION: It did converge at the golden ratio! We also found another root
 at -0.61803. After some other tries of initial guess between 0.0 and 1.5, we found
 that the dividing line is 0.5. Less than 0.5 yields the negative root, and more
-than 0.5 yields the positive root. =#
+than 0.5 yields the positive root. However, starting at 0.5 leads to singularity=#
 
 #= PART 2 =#
 function q2_f2(x::Vector)
@@ -303,6 +272,55 @@ I don't really get the Asympototic Error Constant and its relationship to n.
 
 
 # ========== Question 3 ===========
-
-# x_new function
-# y_new function
+function generalized_newton_method(f, x::Vector, num_iter::Int64;
+                       forward_err_threshold::Float64=1e-8)
+    # f should be a vector valued function (returns multiple values)
+    # this allows efficient generalization to finding roots of many scalar functions
+    jacobian = (x_in -> ForwardDiff.jacobian(f, x_in))
+    f_x = f(x)
+    err_vec = abs.(f_x)
+    println("step:", 0, ", ", x, " error:", err_vec)
+    for i in 1:num_iter
+        j = jacobian(x)
+        #inv_j = inv(j)
+        inv_j = C_NULL
+        try
+            inv_j = inv(j)
+        catch e
+            println("SINGULARITY")
+            break
+        end
+        x = x - inv_j * f_x
+        f_x = f(x)
+        err_vec = abs.(f_x)
+        println("step:",i, ", ", x, " error:", err_vec)
+        if count(x_in->isinf(x_in), x) > 0
+            println("SINGULARITY")
+            break
+        end
+        if count(err->(isnan(err)||isinf(err)), err_vec) > 0
+            println("DIVERGENCE")
+            break
+        end
+        if count(err->(err>forward_err_threshold), err_vec) == 0
+            println("CONVERGENCE")
+            break
+        end
+    end
+    return x
+end
+println("x+y=7;3x-2y=11")
+function f(x::Vector)
+    return [x[1]+x[2]-7, 3x[1]-2x[2]-11]
+end
+generalized_newton_method(f, [420.0, 69.0], 50)
+println("x+y=7;3x+3y=11")
+function f(x::Vector)
+    return [x[1]+x[2]-7, 3x[1]+3x[2]-11]
+end
+generalized_newton_method(f, [420.0, 69.0], 50) # singularity
+println("e^(x+y)=e^7;ln(3x-2y)=ln(11)")
+function f(x::Vector)
+    return [exp(x[1]+x[2])-exp(7), exp(3x[1]-2x[2])-log(11)]
+end
+generalized_newton_method(f, [420.0, 69.0], 50) # divergence
