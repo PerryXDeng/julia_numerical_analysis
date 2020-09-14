@@ -130,11 +130,11 @@ steffensen(g, 1.0)
 #=
 Improvement
 Output:
-g(x)=x-0.5((x^2)-x-1); x0 = 1; expected root 1.618
+g(x)=(-2.5x+((x^2)-1))/-1.5; x0 = 1; expected root 1.618
 FPI
 CONVERGENCE at i=25
-x=1.6180339890192184
+x=1.6180339906726358
 STEFFENSEN
 CONVERGENCE at i=10
-x=1.618033988885942
+x=1.6180339892762732
 =#
