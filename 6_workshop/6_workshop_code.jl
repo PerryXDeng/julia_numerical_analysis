@@ -13,7 +13,7 @@ function steffensen(g, x0::Float64;
                     max_iter::Int64=50,
                     x_convergence_threshold::Float64=1e-8)
     loop_iters = max_iter÷3
-    for i in 0:loop_iters:
+    for i in 0:loop_iters
         x1 = g(x0)
         if abs(x1 - x0) < x_convergence_threshold
             println("CONVERGENCE at i=", 3i + 1)
@@ -67,5 +67,9 @@ end
 
 # Question 3
 
-println("g(x)=cos(x); x0 = 1; expected root approx 0.7")
-#steffensen(x::Float64->cos(x), )
+println("\ng(x)=cos(x); x0 = 1; expected root approx 0.7")
+g(x) = cos(x)
+println("FPI")
+plain_fpi(g, 1.0)
+println("STEFFENSEN")
+steffensen(g, 1.0)
