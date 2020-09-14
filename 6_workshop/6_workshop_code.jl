@@ -63,13 +63,78 @@ function plain_fpi(g, x0::Float64;
     end
     println("x=",x0)
 end
+
+
 # Question 2
 
-# Question 3
 
+
+# Question 3
 println("\ng(x)=cos(x); x0 = 1; expected root approx 0.7")
 g(x) = cos(x)
 println("FPI")
 plain_fpi(g, 1.0)
 println("STEFFENSEN")
 steffensen(g, 1.0)
+#=
+Improves convergence
+Output:
+g(x)=cos(x); x0 = 1; expected root approx 0.7
+FPI
+CONVERGENCE at i=46
+x=0.7390851366465718
+STEFFENSEN
+CONVERGENCE at i=10
+x=0.7390851332482249
+=#
+println("\ng(x)=x/2 + 1/x^2; x0 = 1; expected root approx 1.26")
+g(x) = x/2 + 1/x^2
+println("FPI")
+plain_fpi(g, 1.0)
+println("STEFFENSEN")
+steffensen(g, 1.0)
+#=
+Improves convergence
+Output:
+g(x)=x/2 + 1/x^2; x0 = 1; expected root approx 1.26
+FPI
+CONVERGENCE at i=27
+x=1.2599210520301471
+STEFFENSEN
+CONVERGENCE at i=13
+x=1.2599210498948539
+=#
+println("\ng(x)=x-0.5((x^2)-x-1); x0 = 1; expected root 1.618")
+g(x) = x-0.5((x^2)-x-1)
+println("FPI")
+plain_fpi(g, 1.0)
+println("STEFFENSEN")
+steffensen(g, 1.0)
+#=
+No improvement, possibly due to quadraticly converging FPI on g(x)
+Output:
+g(x)=x-0.5((x^2)-x-1); x0 = 1; expected root 1.618
+FPI
+CONVERGENCE at i=10
+x=1.6180339890192184
+STEFFENSEN
+CONVERGENCE at i=10
+x=1.618033988885942
+=#
+println("\ng(x)=(-2.5x+((x^2)-1))/-1.5; x0 = 1; expected root 1.618")
+g(x) = (-2.5x+((x^2)-1))/(-1.5)
+println("FPI")
+plain_fpi(g, 1.0)
+println("STEFFENSEN")
+steffensen(g, 1.0)
+#=
+Improvement
+Output:
+g(x)=x-0.5((x^2)-x-1); x0 = 1; expected root 1.618
+FPI
+CONVERGENCE at i=25
+x=1.6180339890192184
+STEFFENSEN
+CONVERGENCE at i=10
+x=1.618033988885942
+=#
