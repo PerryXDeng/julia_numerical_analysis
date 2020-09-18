@@ -21,19 +21,19 @@ function newton_method(f, x::Vector, num_iter::Int64;
     f_prime_x = f_prime(x)
     if iszero(f_prime_x)
         println("SINGULARITY")
-        break
+        return
     end
     if isinf(x[1])
         println("SINGULARITY")
-        break
+        return
     end
     if isinf(err) || isnan(err)
         println("DIVERGENCE/ERROR")
-        break
+        return
     end
     if err < forward_err_threshold
         println("CONVERGENCE")
-        break
+        return
     end
     for i in 1:num_iter
         x = [x[1] - f_x/f_prime_x] # conversion between scalar and vector gets complicated
@@ -249,4 +249,38 @@ generalized_newton_method()
 # 1D Newton-Raphson Solver
 generalized_newton_method(combined_eq, [1.0])
 
+
+
 # Question 4
+function f(x::Vector)
+    return ((x[1]^3)/(exp(x[1])-1)) - 0.710717
+end
+
+newton_method(f, [2], 10)
+#= -- Output --
+step:0, [2] error:0.5414241419973251
+step:1, [0.7411328618782589] error:0.3400680511335565
+step:2, [1.1703960565965887] error:0.010401339140347132
+step:3, [1.1574417770874532] error:1.7713790455342604e-5
+step:4, [1.1574637644204022] error:4.9121928746842514e-11
+CONVERGENCE
+=#
+
+newton_method(f, [-1], 10)
+#= -- Output --
+step:0, [1] error:0.1287402931306736
+step:1, [1.1560003332445556] error:0.001179203720922395
+step:2, [1.1574634956512622] error:2.1657806592578766e-7
+step:3, [1.1574637644813663] error:7.105427357601002e-15
+CONVERGENCE
+=#
+
+newton_method(f, [4], 10)
+#= -- Output --
+step:0, [4] error:0.4833540632815392
+step:1, [5.506733542483651] error:0.030096954007320598
+step:2, [5.410454356645018] error:0.0003593241347075171
+step:3, [5.411577280551075] error:4.687668508918108e-8
+step:4, [5.411577427083649] error:6.661338147750939e-16
+CONVERGENCE
+=#
