@@ -66,48 +66,60 @@ end
 
 
 # Question 2
-# working on this one rn -perry
 using Plots
 using Statistics
 
-function make_loglog_error_plots(forward_abs_errors::Array{Float64},
-                    backward_abs_errors::Array{Float64},
-                    meta_info::String, question::String)
+function make_loglog_error_plots(backward_abs_errors::Array{Float64},
+                                 meta_info::String, question::String)
     title = string(question, "\n", meta_info)
-    num_iterations = size(forward_abs_errors, 1)
-    p = plot(1:num_iterations, forward_abs_errors,
-         title=title, legend=false)
-    ylabel!(p, "|f(x)|")
-    xlabel!(p, "n")
-    display(p)
-    log_forward_errors = log.(forward_abs_errors)
-    log_errors_n = log_forward_errors[2:num_iterations]
-    log_errors_n_minus_one = log_forward_errors[1:(num_iterations-1)]
+    num_iterations = size(backward_abs_errors, 1)
+
+    # log log plot slope correspond to the order of the error convergence
+    eps = 1e-15 # prevent breaking when error is 0
+    log_backward_errors = log.(backward_abs_errors .+ eps)
+    log_errors_n = log_backward_errors[2:num_iterations]
+    log_errors_n_minus_one = log_backward_errors[1:(num_iterations-1)]
+
+    # slope for the log log plot over iterations
     delta_y = log_errors_n[2:end] .- log_errors_n[1:end-1]
     delta_x = log_errors_n_minus_one[2:end] .- log_errors_n_minus_one[1:end-1]
     dy_dx = delta_y ./ delta_x
-    dy_dx_avg = mean(dy_dx)
+    mean_slope = mean(dy_dx)
+
     p = plot(log_errors_n_minus_one, log_errors_n,
-         title=string(title, ", avg_slope=", dy_dx_avg), legend=false)
-    ylabel!(p, "ln|f(x_n)|")
-    xlabel!(p, "ln|f(x_n_minus_one)|")
+             title=string(title, ", mean dy/dx=", mean_slope), legend=false,
+             lw=2, marker = ([:hex :d], 3, 0.8))
+    # epsilon_n = |x_n - true_root|
+    ylabel!(p, "ln|epsilon_n|")
+    xlabel!(p, "ln|epsilon_n_minus_one|")
     display(p)
-    p = plot(2:num_iterations-1, dy_dx,
-         title=title, legend=false)
-    ylabel!(p, "d ln|f(x_n)| / d ln|f(x_n_minus_one)|")
-    xlabel!(p, "n")
-    display(p)
+
+    if size(dy_dx, 1) > 0
+        p = plot(2:num_iterations-1, dy_dx,
+             title=title, legend=false, lw=2, marker = ([:hex :d], 3, 0.8))
+        ylabel!(p, "d ln|epsilon_n| / d ln|epsilon_n_minus_one|")
+        xlabel!(p, "n")
+        display(p)
+    end
 end
 
 function halley(f, x::Vector;
+                r::Float64=0,
                 num_iter::Int64=50,
-                forward_err_threshold::Float64=1e-8)
+                forward_err_threshold::Float64=1e-8,
+                question::String)
+    s = string("Halley's Method x0=", x[1])
+    println(s)
     f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
     f_primeprime = (x_in -> ForwardDiff.gradient(f_prime, x_in)[1])
 
+    backward_errs::Array{Float64} = Float64[]
+
     f_x = f(x)
-    err = abs(f_x)
-    println("step:",0, ", ", x, " error:", err)
+    forward_err = abs(f_x)
+    # backward_err = abs(x[1] - r)
+    # push!(backward_errs, backward_err)
+    println("step:",0, ", ", x, " forward_error:", forward_err)
 
     f_prime_x = f_prime(x)
     f_primeprime_x = f_primeprime(x)
@@ -115,21 +127,23 @@ function halley(f, x::Vector;
     denominator = 2*(f_prime_x^2) - f_x * f_primeprime_x
     if iszero(denominator)
         println("SINGULARITY")
-        break
+        return
     end
-    if isinf(err) || isnan(err)
+    if isinf(forward_err) || isnan(forward_err)
         println("DIVERGENCE/ERROR")
-        break
+        return
     end
-    if err < forward_err_threshold
+    if forward_err < forward_err_threshold
         println("CONVERGENCE")
-        break
+        return
     end
     for i in 1:num_iter
         x = [x[1] - numerator/denominator] # conversion between scalar and vector gets complicated
         f_x = f(x)
-        err = abs(f_x)
-        println("step:",i, ", ", x, " error:", err)
+        forward_err = abs(f_x)
+        backward_err = abs(x[1] - r)
+        push!(backward_errs, backward_err)
+        println("step:",i, ", ", x, " forward_error:", forward_err, " backward_error:", backward_err)
 
         f_prime_x = f_prime(x)
         f_primeprime_x = f_primeprime(x)
@@ -143,16 +157,31 @@ function halley(f, x::Vector;
             println("SINGULARITY")
             break
         end
-        if isinf(err) || isnan(err)
+        if isinf(forward_err) || isnan(forward_err)
             println("DIVERGENCE/ERROR")
             break
         end
-        if err < forward_err_threshold
+        if forward_err < forward_err_threshold
             println("CONVERGENCE")
             break
         end
     end
+    println(backward_errs)
+    make_loglog_error_plots(backward_errs, s, question)
 end
+
+# cubic convergence right away
+function f(x::Vector)
+    return x[1]^3 - 2
+end
+halley(f, [2.0], r=2^(1/3), question="f(x)=x^3 - 2")
+
+# cubic convergence right away
+function f(x::Vector)
+    return x[1]^2 - x[1] - 1
+end
+halley(f, [3.0], r=((1+sqrt(5))/2), question="f(x)=x^2 - x - 1")
+
 
 # Question 3
 # working on this one rn -clarissa
