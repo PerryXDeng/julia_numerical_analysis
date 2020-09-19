@@ -186,8 +186,7 @@ halley(f, [3.0], r=((1+sqrt(5))/2), question="f(x)=x^2 - x - 1")
 # Question 3
 # working on this one rn -clarissa
 # x vector is in form: [V, W] for 2-D Newton
-function generalized_newton_method(f, x::Vector, num_iter::Int64=50;
-                       forward_err_threshold::Float64=1e-8)
+function generalized_newton_method(f, x::Vector; num_iter::Int64=50, forward_err_threshold::Float64=1e-8) where T
     # f should be a vector valued function (returns multiple values)
     # this allows efficient generalization to finding roots of many scalar functions
     jacobian = (x_in -> ForwardDiff.jacobian(f, x_in))
@@ -226,30 +225,37 @@ function generalized_newton_method(f, x::Vector, num_iter::Int64=50;
     return x
 end
 
-function eq1(V::Float64, W::Float64) ::Float64
-    return (V * (0.04 + W)^2) - 0.0011111 * ((0.04 + 2W)/(W^2)) - 0.083333
+# x = [V,W]
+function part1_f(x::Vector)
+    return [(x[1] * (0.04 + x[2])^2) - 0.0011111 * ((0.04 + 2*x[2])/(x[2]^2)) - 0.083333,
+    ((-0.04/2)*(1 + x[1])) + ((0.0011111/2)*(x[2]^(-2))) - x[2] + (1/2)*((1-x[1])*x[2] - 1.29074*(sqrt(1-x[1]))) + 1.774598]
 end
 
-function eq2(V::Float64, W::Float64) ::Float64
-    return ((-0.04/2)(1 + V)) + ((0.0011111/2)*(W^(-2))) - W + (1/2)*((1-V)W - 1.29074*(sqrt(1-V))) + 1.774598
-end
-
-function V(W::Float64) ::Float64
-    return (0.083333 + (0.0011111)*(((0.04) + 2W)/(W^2)))/((0.04 + W)^2)
-end
-
-function combined_eq(W::Float64) ::Float64
-    V = V(W)
-    return ((-0.04/2)(1 + V)) + ((0.0011111/2)*(W^(-2))) - W + (1/2)*((1-V)W - 1.29074*(sqrt(1-V))) + 1.774598
+# x = [W]
+function part2_f(x::Vector)
+    v = (0.083333 + (0.0011111)*(((0.04) + 2*x[1])/(x[1]^2)))/((0.04 + x[1])^2)
+    return [((-0.04/2)*(1 + v)) + ((0.0011111/2)*(x[1]^(-2))) - x[1] + (1/2)*((1-v)*x[1] - 1.29074*(sqrt(1-v))) + 1.774598]
 end
 
 # 2D Newton-Raphson Solver
-generalized_newton_method()
+generalized_newton_method(part1_f, [1.0, 1.0])
+# OUTPUT
+#=
+step:0, [1.0, 1.0] error:[0.996000356, 0.7351535499999999]
+step:1, [NaN, NaN] error:[NaN, NaN]
+DIVERGENCE
+=#
 
 # 1D Newton-Raphson Solver
-generalized_newton_method(combined_eq, [1.0])
-
-
+generalized_newton_method(part2_f, [1.0])
+# OUTPUT
+#=
+step:0, [1.0] error:[0.5946940271362104]
+step:1, [2.160773173099978] error:[0.015437716071677432]
+step:2, [2.191867755253506] error:[4.0192938044469884e-7]
+step:3, [2.1918669457317606] error:[2.220446049250313e-16]
+CONVERGENCE
+=#
 
 # Question 4
 function f(x::Vector)
