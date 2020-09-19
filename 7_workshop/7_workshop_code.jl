@@ -60,7 +60,7 @@ out = basis_vec_f.(x_g_vec)
 out = transpose(hcat(out...))
 p = plot(x_g_vec, out, title="Question 2",
      label=[L"f_{k=1}" L"f_{k=2}" L"f_{k=3}" L"f_{k=4}" L"f_{k=5}" L"f_{k=6}"],
-     legend=:bottomright)
+     legend=:bottomright, xaxis=L"x", yaxis=L"f(x)")
 display(p)
 
 # Question 3
