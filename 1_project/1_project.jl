@@ -1,11 +1,12 @@
 #=
 Project #1
-
 Contributors:
 Owen Miller
 Perry Deng
 Clarissa Xue
 =#
+using Plots
+
 @enum SOLVE_TYPE begin
     bisect_type
     fpi_type
@@ -15,7 +16,17 @@ end
 
 
 # =================== Part 1 ===================
-
+#=
+INPUTS:
+M = number of different binding molecules
+ξ = total concentration of the ligand
+ks = equilibrium constants
+ns = total concentrations fo the various binding molecules
+UB: upperbound for plot
+LB: lowerbound for plot, default 0
+OUTPUT:
+x = concentration of unbound lignand in solution
+=#
 function concentrate_unbound_lignand(M, ξ, ks, ns)
     return function f(x)
         sum = 0
@@ -60,7 +71,19 @@ function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess)
     return "done solving"
 end
 
+function plot_concentrate_unbound_lignand(M, ξ, ks, ns, UB, LB=0)
+    f = concentrate_unbound_lignand(M, ξ, ks, ns)
+    plot(f, LB, UB, title = "Ligands and Binding Molecules", label = "f(x)")
+    xlabel!("Concentration")
+    ylabel!("")
+end
 
+M = 1
+ξ = 3
+ks = [1]
+ns = [1]
+UB = 50
+plot_concentrate_unbound_lignand(M, ξ, ks, ns, UB)
 
 # =================== Fixed-point Iteration ===================
 
@@ -178,6 +201,7 @@ function bisection(f, a, b, tolerance)
         if counter >= (n + 2)
             return string("x=", x_m, ", f(x)=", f(x_m), ", n=", n, " iterations reached.")
         end
+        println( "step=", counter, ", x=", x_m, ", f(x)=", f(x_m))
     end
 end
 
