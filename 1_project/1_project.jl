@@ -35,11 +35,11 @@ end
 function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess)
     func = concentrate_unbound_lignand(M, ξ, ks, ns)
     if type == bisect_type
-        bisection(func, guess, 10, 1e^-5)
+        println(bisection(func, guess, 10, 10.0^-6))
     elseif type == fpi_type
         fpi(func, guess)
     elseif type == newton_type
-        newton_method(func, [guess], 10)
+        newton_method(func, [guess], 50)
     end
 
     return "done solving"
@@ -48,7 +48,7 @@ end
 
 # =================== Fixed-point Iteration ===================
 function f(x)
-    return 3 / (1 + (1/(1+x)))
+    return 3 - x * (1/(1+x))
 end
 
 fpi(f, 2)
@@ -71,11 +71,10 @@ Converges to 2.30277
 =#
 
 function f2(x)
-    return 3 / (1 + (5/(1+x)))
+    return 3 - x * (5/(1+x))
 end
 
 fpi(f2, 2)
-# This shouldn't converge but it does... idk
 
 
 
@@ -89,7 +88,6 @@ end
 
 
 concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.6)
-newton_method(g, [1.6], 50)
 #= -- Output --
 step:0, [1.6] error:6.753846153846154
 step:1, [-1.1241050119331741] error:88.45281806498997
@@ -104,12 +102,20 @@ step:9, [-10.099019513589589] error:3.582023566650605e-12
 CONVERGENCE
 =#
 
-newton_method(g, [1.4999], 100)
+concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.4999)
+# this takes a while to converge
 
-newton_method(g, [1.5], 100)
-# this takes so long to converge
 
-newton_method(g, [1.0], 100)
+concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.5)
+# this takes sooooo long to converge, not even sure if it will
+
+concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.0)
+# 6 steps to converge, nice
+
+
+concentrate_unbound_lignand_solver(3, 9, [1 2 6], [2 3 1], bisect_type, 2)
+concentrate_unbound_lignand_solver(3, 9, [1 2 6], [2 3 1], newton_type, 2)
+
 
 
 
