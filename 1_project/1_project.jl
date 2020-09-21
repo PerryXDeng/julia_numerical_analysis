@@ -34,6 +34,7 @@ function concentrate_unbound_lignand(M, ξ, ks, ns)
     end
 end
 
+# Fixed-point Iteration scheme
 function concentrate_unbounc_lignand_fpi(M, ξ, ks, ns)
     return function f(x)
         sum = 0
@@ -47,12 +48,13 @@ end
 function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess)
     func = concentrate_unbound_lignand(M, ξ, ks, ns)
     func_fpi = concentrate_unbounc_lignand_fpi(M, ξ, ks, ns)
+
     if type == bisect_type
         println(bisection(func, guess, 10, 10.0^-6))
     elseif type == fpi_type
         fpi(func_fpi, guess)
     elseif type == newton_type
-        newton_method(func, [guess], 50)
+        newton_method(func, [guess], 80)
     end
 
     return "done solving"
@@ -106,7 +108,7 @@ concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 
 
 
-# ================= Find Positive Root ==================
+# ================== Find Positive Root & Error Calculations ==================
 
 M = 3
 ξ = 9
@@ -114,14 +116,47 @@ ks = [1, 2, 6]
 ns = [2, 3, 1]
 guess = 2
 concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+
+
+
+# =================== 3 Different Cases ===================
+
+M = 5
+ξ = 4
+ks = [4, 7, 9, 3, 2]
+ns = [2, 3, 1, 2, 2]
+guess = 2
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+
+
+M = 3
+ξ = 9
+ks = [1, 5, 7]
+ns = [2, 7, 9]
+guess = 2
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+
+
+M = 3
+ξ = 2
+ks = [1, 2, 6]
+ns = [2, 3, 1]
+guess = 2
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 
 
 
 
-# Root Finding Algorithms
-# ========== Functions ===========
+# =================== Root Finding Algorithms ===================
+
 function bisection(f, a, b, tolerance)
     if f(a) == 0 return a end
     if f(b) == 0 return b end
