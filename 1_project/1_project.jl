@@ -28,7 +28,7 @@ function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type)
     if type == bisect
         bisection(concentrate_unbound_lignand(M, ξ, ks, ns, x), 0, 10, 1e^-5)
     elseif type = fpi
-        fpi(concentrate_unbound_lignand(M, ξ, ks, ns, x), 0)
+        fpi(concentrate_unbound_lignand(M, ξ, ks, ns, x), 2)
     elseif type = newton
         newton(concentrate_unbound_lignand(M, ξ, ks, ns, x), [1], 10)
     end
@@ -37,10 +37,36 @@ function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type)
 end
 
 
+# Fixed-point Iteration
+function f(x)
+    return 3 / (1 + (1/(1+x)))
+end
 
+fpi(f, 2)
+#= -- Output --
+step=0   xold,xnew= 2, 420.69  diff=1.0e-9
+step=1   xold,xnew= 2.25, 2.25  diff=0.25
+step=2   xold,xnew= 2.2941176470588234, 2.2941176470588234  diff=0.04411764705882337
+step=3   xold,xnew= 2.3013698630136985, 2.3013698630136985  diff=0.00725221595487513
+step=4   xold,xnew= 2.3025477707006368, 2.3025477707006368  diff=0.001177907686938262
+step=5   xold,xnew= 2.302738712065137, 2.302738712065137  diff=0.0001909413645000413
+step=6   xold,xnew= 2.3027696542232925, 2.3027696542232925  diff=3.0942158155689015e-5
+step=7   xold,xnew= 2.3027746681592833, 2.3027746681592833  diff=5.013935990838547e-6
+step=8   xold,xnew= 2.3027754806218117, 2.3027754806218117  diff=8.124625283656428e-7
+step=9   xold,xnew= 2.302775612273765, 2.302775612273765  diff=1.3165195333897373e-7
+step=10   xold,xnew= 2.3027756336067275, 2.3027756336067275  diff=2.1332962507614184e-8
+step=11   xold,xnew= 2.302775637063534, 2.302775637063534  diff=3.456806396684442e-9
+step=12   xold,xnew= 2.302775637623677, 2.302775637623677  diff=5.601430430601795e-10
 
+Converges to 2.30277
+=#
 
+function f2(x)
+    return 3 / (1 + (5/(1+x)))
+end
 
+fpi(f2, 2)
+# This shouldn't converge but it does... idk
 
 
 
