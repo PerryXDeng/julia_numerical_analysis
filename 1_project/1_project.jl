@@ -13,7 +13,9 @@ Clarissa Xue
 end
 
 
+
 # =================== Part 1 ===================
+
 function concentrate_unbound_lignand(M, ξ, ks, ns)
     return function f(x)
         sum = 0
@@ -32,12 +34,23 @@ function concentrate_unbound_lignand(M, ξ, ks, ns)
     end
 end
 
+function concentrate_unbounc_lignand_fpi(M, ξ, ks, ns)
+    return function f(x)
+        sum = 0
+        for j in 1:M
+            sum += (ks[j] * ns[j]) / (1 + (ks[j] * x))
+        end
+        return ξ - (x * sum)
+    end
+end
+
 function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess)
     func = concentrate_unbound_lignand(M, ξ, ks, ns)
+    func_fpi = concentrate_unbounc_lignand_fpi(M, ξ, ks, ns)
     if type == bisect_type
         println(bisection(func, guess, 10, 10.0^-6))
     elseif type == fpi_type
-        fpi(func, guess)
+        fpi(func_fpi, guess)
     elseif type == newton_type
         newton_method(func, [guess], 50)
     end
@@ -46,76 +59,63 @@ function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess)
 end
 
 
+
 # =================== Fixed-point Iteration ===================
-function f(x)
-    return 3 - x * (1/(1+x))
-end
 
-fpi(f, 2)
-#= -- Output --
-step=0   xold,xnew= 2, 420.69  diff=1.0e-9
-step=1   xold,xnew= 2.25, 2.25  diff=0.25
-step=2   xold,xnew= 2.2941176470588234, 2.2941176470588234  diff=0.04411764705882337
-step=3   xold,xnew= 2.3013698630136985, 2.3013698630136985  diff=0.00725221595487513
-step=4   xold,xnew= 2.3025477707006368, 2.3025477707006368  diff=0.001177907686938262
-step=5   xold,xnew= 2.302738712065137, 2.302738712065137  diff=0.0001909413645000413
-step=6   xold,xnew= 2.3027696542232925, 2.3027696542232925  diff=3.0942158155689015e-5
-step=7   xold,xnew= 2.3027746681592833, 2.3027746681592833  diff=5.013935990838547e-6
-step=8   xold,xnew= 2.3027754806218117, 2.3027754806218117  diff=8.124625283656428e-7
-step=9   xold,xnew= 2.302775612273765, 2.302775612273765  diff=1.3165195333897373e-7
-step=10   xold,xnew= 2.3027756336067275, 2.3027756336067275  diff=2.1332962507614184e-8
-step=11   xold,xnew= 2.302775637063534, 2.302775637063534  diff=3.456806396684442e-9
-step=12   xold,xnew= 2.302775637623677, 2.302775637623677  diff=5.601430430601795e-10
-
-Converges to 2.30277
-=#
-
-function f2(x)
-    return 3 - x * (5/(1+x))
-end
-
-fpi(f2, 2)
+M = 1
+ξ = 3
+ks = [1]
+ns = [1]
+guess = 2
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
 
 
+M = 1
+ξ = 3
+ks = [1]
+ns = [5]
+guess = 2
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
 
 
 
 # =================== Newton's Method ===================
+
 using ForwardDiff
-function g(x::Vector)
-    return x[1] * (1 + (10 /(1 + x[1]))) - 1
-end
+
+M = 1
+ξ = 1
+ks = [1]
+ns = [10]
+guess = 1.6
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 
 
-concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.6)
-#= -- Output --
-step:0, [1.6] error:6.753846153846154
-step:1, [-1.1241050119331741] error:88.45281806498997
-step:2, [-1.2601310118670497] error:46.18203675669911
-step:3, [-1.5705358283808182] error:24.95684720798347
-step:4, [-2.3572989696013047] error:14.010274589330532
-step:5, [-4.5368300976196] error:7.290560453803925
-step:6, [-8.588461092752654] error:1.729329151905843
-step:7, [-10.061914568142107] error:0.04160499439667453
-step:8, [-10.099003087922368] error:1.8409638565586306e-5
-step:9, [-10.099019513589589] error:3.582023566650605e-12
-CONVERGENCE
-=#
-
-concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.4999)
+guess = 1.4999
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 # this takes a while to converge
 
 
-concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.5)
+guess = 1.5
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 # this takes sooooo long to converge, not even sure if it will
 
-concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.0)
+guess = 1.0
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 # 6 steps to converge, nice
 
 
-concentrate_unbound_lignand_solver(3, 9, [1 2 6], [2 3 1], bisect_type, 2)
-concentrate_unbound_lignand_solver(3, 9, [1 2 6], [2 3 1], newton_type, 2)
 
+# ================= Find Positive Root ==================
+
+M = 3
+ξ = 9
+ks = [1, 2, 6]
+ns = [2, 3, 1]
+guess = 2
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
 
 
 
