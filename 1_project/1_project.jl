@@ -56,16 +56,16 @@ function concentrate_unbounc_lignand_fpi(M, ξ, ks, ns)
     end
 end
 
-function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess)
+function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess, root=nothing)
     func = concentrate_unbound_lignand(M, ξ, ks, ns)
     func_fpi = concentrate_unbounc_lignand_fpi(M, ξ, ks, ns)
 
     if type == bisect_type
-        println(bisection(func, guess, 10, 10.0^-6))
+        return bisection(func, guess, 10, 10.0^-6, root)
     elseif type == fpi_type
-        fpi(func_fpi, guess)
+        return fpi(func_fpi, guess, root)
     elseif type == newton_type
-        newton_method(func, [guess], 80)
+        return newton_method(func, [guess], 80, root)
     end
 
     return "done solving"
@@ -138,9 +138,21 @@ M = 3
 ks = [1, 2, 6]
 ns = [2, 3, 1]
 guess = 2
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+root = 3.806382815465563265304167
+
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess, root)
+plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
+
+
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess, root)
+plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
+
+
+errors = abs.(concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, root))
+plot(errors[1:end-1], errors[2:end], yscale=:log10, xscale=:log10)
+title!("Newton's Method ")
+
+plot([1:length(errors)-1], errors[2:end] ./ ( errors[1:end-1]))
 
 
 
@@ -180,13 +192,14 @@ concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 
 # =================== Root Finding Algorithms ===================
 
-function bisection(f, a, b, tolerance)
+function bisection(f, a, b, tolerance, root)
     if f(a) == 0 return a end
     if f(b) == 0 return b end
     if f(a) * f(b) > 0
-        return "no root in range [a,b]:[" * a * "," * b * "]"
+        return string("no root in range [a,b]:[", a, ",", b, "]")
     end
 
+    ϵ_n = []
     f_t = tolerance
     n = log2((b-a)/f_t)
     counter = 0
@@ -194,32 +207,42 @@ function bisection(f, a, b, tolerance)
         dx = b - a
         x_m = a + (dx/2.0)
         if abs(f(x_m)) < f_t
-            return string("x=", x_m, ", f(x)=", f(x_m), ", steps=", counter)
+            println(string(" -- DONE -- x=", x_m, ", f(x)=", f(x_m), ", steps=", counter))
+            return ϵ_n
         end
         f(a) * f(x_m) <= 0 ? b = x_m : a = x_m
         counter += 1
         if counter >= (n + 2)
-            return string("x=", x_m, ", f(x)=", f(x_m), ", n=", n, " iterations reached.")
+            println(string("x=", x_m, ", f(x)=", f(x_m), ", n=", n, " iterations reached."))
+            return ϵ_n
+        end
+        if root != nothing
+            append!(ϵ_n, x_m - root)
         end
         println( "step=", counter, ", x=", x_m, ", f(x)=", f(x_m))
     end
 end
 
-function fpi(func, xold; max_iter=50, FACC=10.0^-10, DIVERGENCE_THRESHHOLD=10.0^20)
+function fpi(func, xold, root;
+    max_iter=50, FACC=10.0^-10, DIVERGENCE_THRESHHOLD=10.0^20)
     diff = 10*FACC
     step = 0
     xnew = 420.69
+    ϵ_n = []
     while step < max_iter && abs(diff) > FACC && abs(diff) < DIVERGENCE_THRESHHOLD
         println("step=", step, "   xold,xnew= ", xold, ", ", xnew, "  diff=", diff)
         xnew = func(xold)
         diff = xnew-xold
         xold = xnew
         step += 1
+        if root != nothing
+            append!(ϵ_n, xold - root)
+        end
     end
+    return ϵ_n
 end
 
-function newton_method(f, x::Vector, num_iter::Int64;
-                       forward_err_threshold::Float64=1e-8)
+function newton_method(f, x::Vector, num_iter::Int64, root::Float64, forward_err_threshold::Float64=1e-8)
     f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
     #f_2prime = (x_in -> ForwardDiff.gradient(f_prime, x_in)[1])
     f_x = f(x)
@@ -243,12 +266,16 @@ function newton_method(f, x::Vector, num_iter::Int64;
         println("CONVERGENCE")
         return
     end
+    ϵ_n = []
     for i in 1:num_iter
         x = [x[1] - f_x/f_prime_x] # conversion between scalar and vector gets complicated
         f_x = f(x)
         err = abs(f_x)
         f_prime_x = f_prime(x)
         println("step:",i, ", ", x, " error:", err)
+        if root != nothing
+            append!(ϵ_n, x[1] - root)
+        end
         if iszero(f_prime_x)
             println("SINGULARITY")
             break
@@ -266,5 +293,5 @@ function newton_method(f, x::Vector, num_iter::Int64;
             break
         end
     end
-    return x
+    return ϵ_n
 end
