@@ -7,37 +7,46 @@ Perry Deng
 Clarissa Xue
 =#
 @enum SOLVE_TYPE begin
-    bisect
-    fpi
-    newton
+    bisect_type
+    fpi_type
+    newton_type
 end
 
 
-# Part 1
-function concentrate_unbound_lignand(M, ξ, ks, ns, x)
+# =================== Part 1 ===================
+function concentrate_unbound_lignand(M, ξ, ks, ns)
     return function f(x)
         sum = 0
         for j in 1:M
-            sum += (ks[j] * ns[j]) / (1 + (k[j] * x))
+            if isa(x, Vector)
+                sum += (ks[j] * ns[j]) / (1 + (ks[j] * x[1]))
+            else
+                sum += (ks[j] * ns[j]) / (1 + (ks[j] * x))
+            end
         end
-        return x * (1 + sum) - ξ
+        if isa(x, Vector)
+            return x[1] * (1 + sum) - ξ
+        else
+            return x * (1 + sum) - ξ
+        end
     end
 end
 
-function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type)
-    if type == bisect
-        bisection(concentrate_unbound_lignand(M, ξ, ks, ns, x), 0, 10, 1e^-5)
-    elseif type = fpi
-        fpi(concentrate_unbound_lignand(M, ξ, ks, ns, x), 2)
-    elseif type = newton
-        newton(concentrate_unbound_lignand(M, ξ, ks, ns, x), [1], 10)
+function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess)
+    func = concentrate_unbound_lignand(M, ξ, ks, ns)
+    if type == bisect_type
+        bisection(func, guess, 10, 1e^-5)
+    elseif type == fpi_type
+        fpi(func, guess)
+    elseif type == newton_type
+        newton_method(func, [guess], 10)
     end
 
     return "done solving"
 end
 
 
-# Fixed-point Iteration
+# =================== Fixed-point Iteration ===================
 function f(x)
     return 3 / (1 + (1/(1+x)))
 end
@@ -72,12 +81,14 @@ fpi(f2, 2)
 
 
 
-# Newton's Method
+# =================== Newton's Method ===================
 using ForwardDiff
 function g(x::Vector)
     return x[1] * (1 + (10 /(1 + x[1]))) - 1
 end
 
+
+concentrate_unbound_lignand_solver(1, 1, [1], [10], newton_type, 1.6)
 newton_method(g, [1.6], 50)
 #= -- Output --
 step:0, [1.6] error:6.753846153846154
@@ -91,7 +102,14 @@ step:7, [-10.061914568142107] error:0.04160499439667453
 step:8, [-10.099003087922368] error:1.8409638565586306e-5
 step:9, [-10.099019513589589] error:3.582023566650605e-12
 CONVERGENCE
-=# 
+=#
+
+newton_method(g, [1.4999], 100)
+
+newton_method(g, [1.5], 100)
+# this takes so long to converge
+
+newton_method(g, [1.0], 100)
 
 
 
