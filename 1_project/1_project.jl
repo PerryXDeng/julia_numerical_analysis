@@ -1,11 +1,11 @@
 #=
 Project #1
-
 Contributors:
 Owen Miller
 Perry Deng
 Clarissa Xue
 =#
+ENV["GKS_ENCODING"]="utf8"
 @enum SOLVE_TYPE begin
     bisect_type
     fpi_type
@@ -66,7 +66,6 @@ step=9   xold,xnew= 2.302775612273765, 2.302775612273765  diff=1.316519533389737
 step=10   xold,xnew= 2.3027756336067275, 2.3027756336067275  diff=2.1332962507614184e-8
 step=11   xold,xnew= 2.302775637063534, 2.302775637063534  diff=3.456806396684442e-9
 step=12   xold,xnew= 2.302775637623677, 2.302775637623677  diff=5.601430430601795e-10
-
 Converges to 2.30277
 =#
 
@@ -143,6 +142,7 @@ function bisection(f, a, b, tolerance)
         if counter >= (n + 2)
             return string("x=", x_m, ", f(x)=", f(x_m), ", n=", n, " iterations reached.")
         end
+        println( "step=", counter, ", x=", x_m, ", f(x)=", f(x_m))
     end
 end
 
