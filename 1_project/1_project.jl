@@ -48,6 +48,7 @@ end
 # Fixed-point Iteration scheme
 function concentrate_unbound_lignand_fpi(M, ξ, ks, ns, genAlpha::Bool=true, α=1)
     return function f(x)
+        α = Base.sum(ks .* ns)
         sum = 0
         if genAlpha
             α = 0
@@ -71,7 +72,7 @@ function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess, genAlpha
     func_fpi = concentrate_unbound_lignand_fpi(M, ξ, ks, ns, genAlpha)
 
     if type == bisect_type
-        return bisection(func, guess, 10, 10.0^-6, root)
+        return bisection(func, guess, 100, 10.0^-6, root)
     elseif type == fpi_type
         return fpi(func_fpi, guess, root)
     elseif type == newton_type
@@ -111,9 +112,9 @@ M = 1
 ξ = 3
 ks = [1]
 ns = [1]
-UB = 5
+UB = 50
 plot_concentrate_unbound_lignand(M, ξ, ks, ns, UB)
-plot_derivative_concentrate_unbound_lignand(M, ξ, ks, ns, UB)
+
 
 
 # =================== Fixed-point Iteration ===================
@@ -147,7 +148,7 @@ concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess, false) # α =
 #= OUTPUT
 gives a negative solution, so this doesn't work
 step=60   xold,xnew= -3.791287847538623, -3.791287847538623  diff=-1.552935557924684e-10
-
+=#
 concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess) # α = generalized
 #= OUTPUT
 step=0   xold,xnew= 2, 420.69  diff=1.0e-9
@@ -232,19 +233,40 @@ ks = [1, 2, 6]
 ns = [2, 3, 1]
 guess = 2
 root = 3.806382815465563265304167
+plotly()
 
 errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess, root)
 plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
-title!("Bisection Method Errors")
+xaxis!("n")
+yaxis!("ϵ_{n+1} / ϵ_n")
+plot([1:length(errors)-1], abs.(errors[2:end] .- errors[1:end-1]))
+xaxis!("n")
+yaxis!("|ϵ_{n+1} - ϵ_n|")
+plot([1:length(errors)-1], abs.(errors[2:end] .- root) ./ (abs.(errors[1:end-1] .- root) .^ (1)))
+xaxis!("n")
+yaxis!("|ϵ_{n+1} - r| / |ϵ_n - r|^α")
 
 errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess, root)
 plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
-title!("FPI Method Errors")
+xaxis!("n")
+yaxis!("ϵ_{n+1} / ϵ_n")
+plot([1:length(errors)-1], abs.(errors[2:end] - errors[1:end-1]))
+xaxis!("n")
+yaxis!("|ϵ_{n+1} - ϵ_n|")
+plot([1:length(errors)-1], abs.(errors[2:end] .- root) ./ (abs.(errors[1:end-1] .- root) .^ (1)))
+xaxis!("n")
+yaxis!("|ϵ_{n+1} - r| / |ϵ_n - r|^α")
 
 errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, root)
 plot([1:length(errors)-1], errors[2:end] ./ ( errors[1:end-1]))
-title!("Newton's Method Errors")
-
+xaxis!("n")
+yaxis!("ϵ_{n+1} / ϵ_n")
+plot([1:length(errors)-1], abs.(errors[2:end] - errors[1:end-1]))
+xaxis!("n")
+yaxis!("|ϵ_{n+1} - ϵ_n|")
+plot([1:length(errors)-1], abs.(errors[2:end] .- root) ./ (abs.(errors[1:end-1] .- root) .^ (2)))
+xaxis!("n")
+yaxis!("|ϵ_{n+1} - r| / |ϵ_n - r|^α")
 
 
 # =================== 3 Different Cases ===================
@@ -253,7 +275,7 @@ M = 5
 ξ = 4
 ks = [4, 7, 9, 3, 2]
 ns = [2, 3, 1, 2, 2]
-guess = 2.0
+guess = 0
 println("\nCase 1: Bisection Method")
 concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
 println("\nCase 1: FPI Method")
@@ -293,7 +315,7 @@ M = 3
 ξ = 9
 ks = [1, 5, 7]
 ns = [2, 7, 9]
-guess = 2
+guess = 0
 println("\nCase 2: Bisection Method")
 concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
 println("\nCase 2: FPI Method")
@@ -332,7 +354,7 @@ M = 3
 ξ = 2
 ks = [1, 2, 6]
 ns = [2, 3, 1]
-guess = 2
+guess = 0
 println("\nCase 3: Bisection Method")
 concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
 println("\nCase 3: FPI Method")
@@ -404,7 +426,7 @@ function bisection(f, a, b, tolerance, root)
         f(a) * f(x_m) <= 0 ? b = x_m : a = x_m
         counter += 1
         if counter >= (n + 2)
-            println(string("x=", x_m, ", f(x)=", f(x_m), ", n=", n, " iterations reached."))
+            println(string("x=", x_m, ", f(x)=", f(x_m), ", n=", counter, " iterations reached."))
             return ϵ_n
         end
         if root != nothing
@@ -418,7 +440,7 @@ function fpi(func, xold, root;
     max_iter=150, FACC=10.0^-10, DIVERGENCE_THRESHHOLD=10.0^20)
     diff = 10*FACC
     step = 0
-    xnew = 420.69
+    xnew = 30
     ϵ_n = []
     while step < max_iter && abs(diff) > FACC && abs(diff) < DIVERGENCE_THRESHHOLD
         println("step=", step, "   xold,xnew= ", xold, ", ", xnew, "  diff=", diff)
@@ -435,6 +457,7 @@ end
 
 function newton_method(f, x::Vector, num_iter::Float64, root, forward_err_threshold::Float64=1e-8)
     f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
+    #f_2prime = (x_in -> ForwardDiff.gradient(f_prime, x_in)[1])
     f_x = f(x)
     err = abs(f_x)
     println("step:", 0, ", ", x, " error:", err)
