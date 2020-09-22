@@ -142,17 +142,15 @@ root = 3.806382815465563265304167
 
 errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess, root)
 plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
-
+title!("Bisection Method Errors")
 
 errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess, root)
 plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
+title!("FPI Method Errors")
 
-
-errors = abs.(concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, root))
-plot(errors[1:end-1], errors[2:end], yscale=:log10, xscale=:log10)
-title!("Newton's Method ")
-
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, root)
 plot([1:length(errors)-1], errors[2:end] ./ ( errors[1:end-1]))
+title!("Newton's Method Errors")
 
 
 
