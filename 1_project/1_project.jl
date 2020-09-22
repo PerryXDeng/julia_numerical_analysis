@@ -86,7 +86,7 @@ function derivative_concentrate_unbound_lignand(M, ξ, ks, ns)
             gsum_prime += -((ks[j]^2) * (ns[j])) / ((1 + (ks[j] * x))^2)
             gsum += (ks[j] * ns[j]) / (1 + (ks[j] * x[1]))
         end
-        return gsum + (x[1] * gsum_prime)
+        return (1 + gsum) + (x[1] * gsum_prime)
     end
 end
 
@@ -101,7 +101,7 @@ M = 1
 ξ = 3
 ks = [1]
 ns = [1]
-UB = 50
+UB = 5
 plot_concentrate_unbound_lignand(M, ξ, ks, ns, UB)
 plot_derivative_concentrate_unbound_lignand(M, ξ, ks, ns, UB)
 
