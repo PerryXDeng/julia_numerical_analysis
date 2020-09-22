@@ -72,8 +72,27 @@ end
 function plot_concentrate_unbound_lignand(M, ξ, ks, ns, UB, LB=0)
     f = concentrate_unbound_lignand(M, ξ, ks, ns)
     plot(f, LB, UB, title = "Ligands and Binding Molecules", label = "f(x)")
-    xlabel!("Concentration")
-    ylabel!("")
+    xlabel!("x")
+    ylabel!("f(x)")
+end
+
+function derivative_concentrate_unbound_lignand(M, ξ, ks, ns)
+    return function f_prime(x)
+        gsum = 0
+        gsum_prime = 0
+        for j in 1:M
+            gsum_prime += -((ks[j]^2) * (ns[j])) / ((1 + (ks[j] * x))^2)
+            gsum += (ks[j] * ns[j]) / (1 + (ks[j] * x[1]))
+        end
+        return gsum + (x[1] * gsum_prime)
+    end
+end
+
+function plot_derivative_concentrate_unbound_lignand(M, ξ, ks, ns, UB, LB=0)
+    f_prime = derivative_concentrate_unbound_lignand(M, ξ, ks, ns)
+    plot(f_prime, LB, UB, title = "Derivative", label = "f'(x)")
+    xlabel!("x")
+    ylabel!("f'(x)")
 end
 
 M = 1
@@ -82,6 +101,8 @@ ks = [1]
 ns = [1]
 UB = 50
 plot_concentrate_unbound_lignand(M, ξ, ks, ns, UB)
+plot_derivative_concentrate_unbound_lignand(M, ξ, ks, ns, UB)
+
 
 # =================== Fixed-point Iteration ===================
 
@@ -186,7 +207,6 @@ end
 function newton_method(f, x::Vector, num_iter::Int64;
                        forward_err_threshold::Float64=1e-8)
     f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
-    #f_2prime = (x_in -> ForwardDiff.gradient(f_prime, x_in)[1])
     f_x = f(x)
     err = abs(f_x)
     println("step:", 0, ", ", x, " error:", err)
