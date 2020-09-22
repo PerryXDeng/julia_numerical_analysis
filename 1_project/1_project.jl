@@ -61,9 +61,9 @@ function concentrate_unbound_lignand_fpi(M, ξ, ks, ns, genAlpha::Bool=true, α=
 end
 
 # use genAlpha = false when need to use α = 0
-function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess, genAlpha::Bool=true, root=nothing)
+function concentrate_unbound_lignand_solver(M, ξ, ks, ns, type, guess, genAlpha::Bool=true, root=nothing, α=0)
     func = concentrate_unbound_lignand(M, ξ, ks, ns)
-    func_fpi = concentrate_unbound_lignand_fpi(M, ξ, ks, ns, genAlpha)
+    func_fpi = concentrate_unbound_lignand_fpi(M, ξ, ks, ns, genAlpha, α)
 
     if type == bisect_type
         return bisection(func, guess, 100, 10.0^-6, root)
@@ -189,7 +189,6 @@ step=40   xold,xnew= 0.7912878479598477, 0.7912878479598477  diff=-3.58218454898
 step=41   xold,xnew= 0.7912878477543651, 0.7912878477543651  diff=-2.054826309105806e-10
 step=42   xold,xnew= 0.7912878476364954, 0.7912878476364954  diff=-1.1786971398919377e-10
 =#
-
 
 
 # =================== Newton's Method ===================
