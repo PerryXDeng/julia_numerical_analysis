@@ -297,7 +297,14 @@ step=40   xold,xnew= 0.7912878479598477, 0.7912878479598477  diff=-3.58218454898
 step=41   xold,xnew= 0.7912878477543651, 0.7912878477543651  diff=-2.054826309105806e-10
 step=42   xold,xnew= 0.7912878476364954, 0.7912878476364954  diff=-1.1786971398919377e-10
 =#
-
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, 3)
+#=
+converges in 44 steps
+=#
+concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, 10)
+#=
+converges in 49 steps
+=#
 
 # =================== Newton's Method ===================
 
