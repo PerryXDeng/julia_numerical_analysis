@@ -14,6 +14,114 @@ using Plots
 end
 
 
+# =================== Root Finding Algorithms ===================
+
+function bisection(f, a, b, tolerance, root)
+    if f(a) == 0 return a end
+    if f(b) == 0 return b end
+    if f(a) * f(b) > 0
+        println("no root in range [a,b]:[", a, ",", b, "]")
+        return 0
+    end
+
+    ϵ_n = []
+    f_t = tolerance
+    n = log2((b-a)/f_t)
+    counter = 0
+    while true
+        dx = b - a
+        x_m = a + (dx/2.0)
+        if abs(f(x_m)) < f_t
+            println(string(" -- DONE -- x=", x_m, ", f(x)=", f(x_m), ", steps=", counter))
+            return ϵ_n
+        end
+        f(a) * f(x_m) <= 0 ? b = x_m : a = x_m
+        counter += 1
+        if counter >= (n + 2)
+            println(string("x=", x_m, ", f(x)=", f(x_m), ", n=", counter, " iterations reached."))
+            return ϵ_n
+        end
+        if root != nothing
+            append!(ϵ_n, x_m - root)
+        end
+        println( "step=", counter, ", x=", x_m, ", f(x)=", f(x_m))
+    end
+end
+
+function fpi(func, xold, root;
+    max_iter=100, FACC=10.0^-10, DIVERGENCE_THRESHHOLD=10.0^20)
+    diff = 10*FACC
+    step = 0
+    xnew = 30
+    ϵ_n = []
+    while step < max_iter && abs(diff) > FACC && abs(diff) < DIVERGENCE_THRESHHOLD
+        println("step=", step, "   xold,xnew= ", xold, ", ", xnew, "  diff=", diff)
+        xnew = func(xold)
+        diff = xnew-xold
+        xold = xnew
+        step += 1
+        if root != nothing
+            append!(ϵ_n, xold - root)
+        end
+    end
+    return ϵ_n
+end
+
+function newton_method(f, x::Vector, num_iter::Float64, root, forward_err_threshold::Float64=1e-8)
+    f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
+    f_x = f(x)
+    err = abs(f_x)
+    println("step:", 0, ", ", x, " error:", err)
+
+    f_prime_x = f_prime(x)
+    if iszero(f_prime_x)
+        println("SINGULARITY")
+        return
+    end
+    if isinf(x[1])
+        println("SINGULARITY")
+        return
+    end
+    if isinf(err) || isnan(err)
+        println("DIVERGENCE/ERROR")
+        return
+    end
+    if err < forward_err_threshold
+        println("CONVERGENCE")
+        return
+    end
+    ϵ_n = []
+    for i in 1:num_iter
+        x = [x[1] - f_x/f_prime_x] # conversion between scalar and vector gets complicated
+        f_x = f(x)
+        err = abs(f_x)
+        f_prime_x = f_prime(x)
+        println("step:",i, ", ", x, " error:", err)
+        if root != nothing
+            append!(ϵ_n, x[1] - root)
+        end
+        if iszero(f_prime_x)
+            println("SINGULARITY")
+            break
+        end
+        if isinf(x[1])
+            println("SINGULARITY")
+            break
+        end
+        if isinf(err) || isnan(err)
+            println("DIVERGENCE/ERROR")
+            break
+        end
+        if err < forward_err_threshold
+            println("CONVERGENCE")
+            break
+        end
+    end
+    return ϵ_n
+end
+
+
+
 
 # =================== Part 1 ===================
 #=
@@ -589,111 +697,3 @@ step:4, [0.20970032089839608] error:6.570945787487403e-8
 step:5, [0.20970033097435653] error:8.881784197001252e-16
 CONVERGENCE
 =#
-
-
-
-# =================== Root Finding Algorithms ===================
-
-function bisection(f, a, b, tolerance, root)
-    if f(a) == 0 return a end
-    if f(b) == 0 return b end
-    if f(a) * f(b) > 0
-        println("no root in range [a,b]:[", a, ",", b, "]")
-        return 0
-    end
-
-    ϵ_n = []
-    f_t = tolerance
-    n = log2((b-a)/f_t)
-    counter = 0
-    while true
-        dx = b - a
-        x_m = a + (dx/2.0)
-        if abs(f(x_m)) < f_t
-            println(string(" -- DONE -- x=", x_m, ", f(x)=", f(x_m), ", steps=", counter))
-            return ϵ_n
-        end
-        f(a) * f(x_m) <= 0 ? b = x_m : a = x_m
-        counter += 1
-        if counter >= (n + 2)
-            println(string("x=", x_m, ", f(x)=", f(x_m), ", n=", counter, " iterations reached."))
-            return ϵ_n
-        end
-        if root != nothing
-            append!(ϵ_n, x_m - root)
-        end
-        println( "step=", counter, ", x=", x_m, ", f(x)=", f(x_m))
-    end
-end
-
-function fpi(func, xold, root;
-    max_iter=100, FACC=10.0^-10, DIVERGENCE_THRESHHOLD=10.0^20)
-    diff = 10*FACC
-    step = 0
-    xnew = 30
-    ϵ_n = []
-    while step < max_iter && abs(diff) > FACC && abs(diff) < DIVERGENCE_THRESHHOLD
-        println("step=", step, "   xold,xnew= ", xold, ", ", xnew, "  diff=", diff)
-        xnew = func(xold)
-        diff = xnew-xold
-        xold = xnew
-        step += 1
-        if root != nothing
-            append!(ϵ_n, xold - root)
-        end
-    end
-    return ϵ_n
-end
-
-function newton_method(f, x::Vector, num_iter::Float64, root, forward_err_threshold::Float64=1e-8)
-    f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
-    f_x = f(x)
-    err = abs(f_x)
-    println("step:", 0, ", ", x, " error:", err)
-
-    f_prime_x = f_prime(x)
-    if iszero(f_prime_x)
-        println("SINGULARITY")
-        return
-    end
-    if isinf(x[1])
-        println("SINGULARITY")
-        return
-    end
-    if isinf(err) || isnan(err)
-        println("DIVERGENCE/ERROR")
-        return
-    end
-    if err < forward_err_threshold
-        println("CONVERGENCE")
-        return
-    end
-    ϵ_n = []
-    for i in 1:num_iter
-        x = [x[1] - f_x/f_prime_x] # conversion between scalar and vector gets complicated
-        f_x = f(x)
-        err = abs(f_x)
-        f_prime_x = f_prime(x)
-        println("step:",i, ", ", x, " error:", err)
-        if root != nothing
-            append!(ϵ_n, x[1] - root)
-        end
-        if iszero(f_prime_x)
-            println("SINGULARITY")
-            break
-        end
-        if isinf(x[1])
-            println("SINGULARITY")
-            break
-        end
-        if isinf(err) || isnan(err)
-            println("DIVERGENCE/ERROR")
-            break
-        end
-        if err < forward_err_threshold
-            println("CONVERGENCE")
-            break
-        end
-    end
-    return ϵ_n
-end
