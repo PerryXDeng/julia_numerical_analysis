@@ -67,7 +67,7 @@ function fpi(func, xold, root;
     return ϵ_n
 end
 
-function newton_method(f, x::Vector, num_iter::Float64, root, forward_err_threshold::Float64=1e-8)
+function newton_method(f, x::Vector, num_iter::Int64, root, forward_err_threshold::Float64=1e-8)
     f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
     f_x = f(x)
     err = abs(f_x)
