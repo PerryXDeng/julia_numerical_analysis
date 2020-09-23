@@ -67,7 +67,7 @@ function fpi(func, xold, root;
     return ϵ_n
 end
 
-function newton_method(f, x::Vector, num_iter::Int64, root, forward_err_threshold::Float64=1e-8)
+function newton_method(f, x::Vector, num_iter, root, forward_err_threshold::Float64=1e-8)
     f_prime = (x_in -> ForwardDiff.gradient(f, x_in)[1])
     f_x = f(x)
     err = abs(f_x)
@@ -343,7 +343,7 @@ guess = 2
 root = 3.806382815465563265304167
 plotly()
 
-errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess, root)
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess, false, root)
 plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
 xaxis!("n")
 yaxis!("ϵ_{n+1} / ϵ_n")
@@ -354,7 +354,7 @@ plot([1:length(errors)-1], abs.(errors[2:end] .- root) ./ (abs.(errors[1:end-1] 
 xaxis!("n")
 yaxis!("|ϵ_{n+1} - r| / |ϵ_n - r|^α")
 
-errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess, root)
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess, true, root)
 plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
 xaxis!("n")
 yaxis!("ϵ_{n+1} / ϵ_n")
@@ -365,7 +365,7 @@ plot([1:length(errors)-1], abs.(errors[2:end] .- root) ./ (abs.(errors[1:end-1] 
 xaxis!("n")
 yaxis!("|ϵ_{n+1} - r| / |ϵ_n - r|^α")
 
-errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, root)
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, false, root)
 plot([1:length(errors)-1], errors[2:end] ./ ( errors[1:end-1]))
 xaxis!("n")
 yaxis!("ϵ_{n+1} / ϵ_n")
