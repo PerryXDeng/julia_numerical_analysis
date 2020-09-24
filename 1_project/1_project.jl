@@ -42,7 +42,7 @@ function bisection(f, a, b, tolerance, root)
             return ϵ_n
         end
         if root != nothing
-            append!(ϵ_n, x_m - root)
+            append!(ϵ_n, abs(x_m - root))
         end
         println( "step=", counter, ", x=", x_m, ", f(x)=", f(x_m))
     end
@@ -61,7 +61,7 @@ function fpi(func, xold, root;
         xold = xnew
         step += 1
         if root != nothing
-            append!(ϵ_n, xold - root)
+            append!(ϵ_n, abs(xold - root))
         end
     end
     return ϵ_n
@@ -98,7 +98,7 @@ function newton_method(f, x::Vector, num_iter, root, forward_err_threshold::Floa
         f_prime_x = f_prime(x)
         println("step:",i, ", ", x, " error:", err)
         if root != nothing
-            append!(ϵ_n, x[1] - root)
+            append!(ϵ_n, abs(x[1] - root))
         end
         if iszero(f_prime_x)
             println("SINGULARITY")
@@ -310,25 +310,47 @@ converges in 49 steps
 
 using ForwardDiff
 
+using LaTeXStrings
+function error_plots(errors::Vector, alpha::Float64)
+    gr()
+    err_n = errors[2:end]
+    err_n_minus_one = errors[1:end-1]
+    iters = [2:length(errors)]
+
+    p = plot(iters, log.(err_n.+1e-28) ./ log.(err_n_minus_one.+1e-28),
+             xaxis=L"n", yaxis=L"\frac{ln(\epsilon_{n+1})}{ln(\epsilon_{n})}",
+             legend=false)
+    display(p)
+    p = plot(iters, err_n ./ (err_n_minus_one.^alpha), xaxis=L"n",
+             yaxis=L"\frac{\epsilon_{n+1}}{\epsilon_{n}^{a}}", legend=false)
+    display(p)
+end
+
 M = 1
 ξ = 1
 ks = [1]
 ns = [10]
 guess = 1.6
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
-
+root = -10.099019513589589
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, false, root)
+error_plots(errors, 1.0)
 
 guess = 1.4999
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
-# this takes a while to converge
+root = 0.09901951359277852
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, false, root)
+error_plots(errors, 1.0)
 
 
 guess = 1.5
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+root = -10.099019513589589
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, false, root)
+error_plots(errors, 1.0)
 # this takes sooooo long to converge, not even sure if it will
 
 guess = 1.0
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+root = 0.09901951359277852
+errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, false, root)
+error_plots(errors, 2.0)
 # 6 steps to converge, nice
 
 
@@ -341,41 +363,21 @@ ks = [1, 2, 6]
 ns = [2, 3, 1]
 guess = 2
 root = 3.806382815465563265304167
-plotly()
 
 errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess, false, root)
-plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
-xaxis!("n")
-yaxis!("ϵ_{n+1} / ϵ_n")
-plot([1:length(errors)-1], abs.(errors[2:end] .- errors[1:end-1]))
-xaxis!("n")
-yaxis!("|ϵ_{n+1} - ϵ_n|")
-plot([1:length(errors)-1], abs.(errors[2:end] .- root) ./ (abs.(errors[1:end-1] .- root) .^ (1)))
-xaxis!("n")
-yaxis!("|ϵ_{n+1} - r| / |ϵ_n - r|^α")
+error_plots(errors, 1.0)
+err_n = errors[16:end]
+err_n_minus_one = errors[15:end-1]
+iters = [16:length(errors)]
+p = plot(iters, err_n ./ (err_n_minus_one), xaxis=L"n",
+         yaxis=L"\frac{\epsilon_{n+1}}{\epsilon_{n}^{a}}", legend=false)
+display(p)
 
 errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess, true, root)
-plot([1:length(errors)-1], errors[2:end] ./ errors[1:end-1])
-xaxis!("n")
-yaxis!("ϵ_{n+1} / ϵ_n")
-plot([1:length(errors)-1], abs.(errors[2:end] - errors[1:end-1]))
-xaxis!("n")
-yaxis!("|ϵ_{n+1} - ϵ_n|")
-plot([1:length(errors)-1], abs.(errors[2:end] .- root) ./ (abs.(errors[1:end-1] .- root) .^ (1)))
-xaxis!("n")
-yaxis!("|ϵ_{n+1} - r| / |ϵ_n - r|^α")
+error_plots(errors, 1.0)
 
 errors = concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess, false, root)
-plot([1:length(errors)-1], errors[2:end] ./ ( errors[1:end-1]))
-xaxis!("n")
-yaxis!("ϵ_{n+1} / ϵ_n")
-plot([1:length(errors)-1], abs.(errors[2:end] - errors[1:end-1]))
-xaxis!("n")
-yaxis!("|ϵ_{n+1} - ϵ_n|")
-plot([1:length(errors)-1], abs.(errors[2:end] .- root) ./ (abs.(errors[1:end-1] .- root) .^ (2)))
-xaxis!("n")
-yaxis!("|ϵ_{n+1} - r| / |ϵ_n - r|^α")
-
+error_plots(errors, 2.0)
 
 # =================== 3 Different Cases ===================
 
@@ -385,11 +387,11 @@ ks = [4, 7, 9, 3, 2]
 ns = [2, 3, 1, 2, 2]
 guess = 0
 println("\nCase 1: Bisection Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
 println("\nCase 1: FPI Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
 println("\nCase 1: Newton Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 # === OUTPUT === #
 #=
 Case 1: Bisection Method
@@ -490,11 +492,11 @@ ks = [1, 5, 7]
 ns = [2, 7, 9]
 guess = 0
 println("\nCase 2: Bisection Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
 println("\nCase 2: FPI Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
 println("\nCase 2: Newton Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 # === OUTPUT === #
 #=
 Case 2: Bisection Method
@@ -620,11 +622,11 @@ ks = [1, 2, 6]
 ns = [2, 3, 1]
 guess = 0
 println("\nCase 3: Bisection Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, bisect_type, guess)
 println("\nCase 3: FPI Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, fpi_type, guess)
 println("\nCase 3: Newton Method")
-concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
+@time concentrate_unbound_lignand_solver(M, ξ, ks, ns, newton_type, guess)
 # === OUTPUT === #
 #=
 Case 3: Bisection Method
