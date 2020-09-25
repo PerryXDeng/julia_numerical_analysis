@@ -53,28 +53,24 @@ end
 
 # x: x values of interpolating points
 # c: array of coefficients taken from top edge of triangle
-# x_in: x values to evaluate polynomial at
-function horners_method(x::Vector{Float64}, c::Vector{Float64}, x_in::Vector{Float64}) ::Vector{Vector{Float64}}
+# x_in: x value to evaluate polynomial at
+function horners_method(x::Vector{Float64}, c::Vector{Float64}, x_in::Float64)::Float64
     n = length(x)
-    y = Vector{Float64}()
     # loop through x_in to evaluate
-    for i in 1:length(x_in)
-        m = n
-        P = c[m]
-        # horner's method
-        while m > 1
-            m -= 1
-            P = c[m] + ((x_in[i] - x[m]) * (P))
-        end
-        push!(y, P)
+    p = c[n]
+    for i in length(c)-1:-1:1
+        p += p*(x_in - x[i]) + c[i]
     end
-    println(typeof(y))
-    println(y)
-    return 0
+    return p
+end
+function horners_method_vector(x::Vector{Float64}, c::Vector{Float64},
+                               x_in::Vector{Float64})::Vector{Float64}
+    # if confused about why we have (x, )
+    # see https://discourse.julialang.org/t/how-to-broadcast-over-only-certain-function-arguments/19274
+    return horners_method.((x,), (c,), x_in)
 end
 
 # test triangle, using one from the slides, should print [1, 0.5, 0,5]. passes
 println(get_triangle_poly_coefs(construct_triangle([0.0, 2.0, 3.0], [1.0, 2.0, 4.0])))
 c = get_triangle_poly_coefs(construct_triangle([0.0, 2.0, 3.0], [1.0, 2.0, 4.0]))
-println(typeof(c))
-horners_method([0.0, 2.0, 3.0], c, [0.0, 2.0])
+horners_method_vector([0.0, 2.0, 3.0], c, [0.0, 2.0]) # returns 2, 4 as expected
