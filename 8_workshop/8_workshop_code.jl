@@ -51,6 +51,30 @@ function get_triangle_poly_coefs(triangle::Vector{Vector{Float64}})::Vector{Floa
     return getindex.(triangle, 1) # gets the first element of all rows
 end
 
+# x: x values of interpolating points
+# c: array of coefficients taken from top edge of triangle
+# x_in: x values to evaluate polynomial at
+function horners_method(x::Vector{Float64}, c::Vector{Float64}, x_in::Vector{Float64}) ::Vector{Vector{Float64}}
+    n = length(x)
+    y = Vector{Float64}()
+    # loop through x_in to evaluate
+    for i in 1:length(x_in)
+        m = n
+        P = c[m]
+        # horner's method
+        while m > 1
+            m -= 1
+            P = c[m] + ((x_in[i] - x[m]) * (P))
+        end
+        push!(y, P)
+    end
+    println(typeof(y))
+    println(y)
+    return 0
+end
 
 # test triangle, using one from the slides, should print [1, 0.5, 0,5]. passes
 println(get_triangle_poly_coefs(construct_triangle([0.0, 2.0, 3.0], [1.0, 2.0, 4.0])))
+c = get_triangle_poly_coefs(construct_triangle([0.0, 2.0, 3.0], [1.0, 2.0, 4.0]))
+println(typeof(c))
+horners_method([0.0, 2.0, 3.0], c, [0.0, 2.0])
