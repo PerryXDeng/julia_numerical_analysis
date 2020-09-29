@@ -85,9 +85,16 @@ println(y_estimated)
 [0.9165188922906382, 1.2527066051592177, 1.5041015312414938, 1.7047316940606938, 1.871819317912857, 2.0148752083875547, 2.140140249284577, 2.250914263723907, 2.3578923136608574]
 =#
 
+# 3c. theoretical error bound
+nth_derivative_abs(x::Float64)::Float64 = abs(-362880/(x^10))
+nth_d_max = maximum(nth_derivative_abs.(x_new))
+error_bound(in::Float64) = abs((nth_d_max*prod(in .- x)/factorial(10)))
+println(error_bound.(x_new))
+
 # 3d. empirical errors
 y_expected = log.(x_new)
 errors = abs.(y_expected - y_estimated)
+println(errors)
 using Plots
 using LaTeXStrings
 p1 = plot(x_new, [y_expected y_estimated], label=[L"ln(x)" L"L(x)"],
