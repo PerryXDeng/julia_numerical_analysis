@@ -10,7 +10,7 @@ Clarissa Xue
 function generate_x_basis(n::Int)::Vector{Float64}
     # returns a vector of size n for basis, equally spaced between 0 and 1
     # including 0 and 1
-    return Vector{Float64}(0:n-1) ./ Float64(n-1)
+    return (Vector{Float64}(0:n-1) ./ Float64(n-1))
 end
 function generate_x_graph(M::Int)::Vector{Float64}
     # returns a vector of size M for graphing
@@ -59,7 +59,7 @@ function horners_method(x::Vector{Float64}, c::Vector{Float64}, x_in::Float64)::
     # loop through x_in to evaluate
     p = c[n]
     for i in length(c)-1:-1:1
-        p += p*(x_in - x[i]) + c[i]
+        p = p*(x_in - x[i]) + c[i]
     end
     return p
 end
@@ -73,4 +73,68 @@ end
 # test triangle, using one from the slides, should print [1, 0.5, 0,5]. passes
 println(get_triangle_poly_coefs(construct_triangle([0.0, 2.0, 3.0], [1.0, 2.0, 4.0])))
 c = get_triangle_poly_coefs(construct_triangle([0.0, 2.0, 3.0], [1.0, 2.0, 4.0]))
-horners_method_vector([0.0, 2.0, 3.0], c, [0.0, 2.0]) # returns 2, 4 as expected
+println(c)
+println(horners_method_vector([0.0, 2.0, 3.0], c, [0.0, 2.0])) # returns 1,2 as expected
+
+# Question 2
+using LinearAlgebra, Statistics, Compat
+using Plots
+using LaTeXStrings
+A = zeros(6,6)
+D = Diagonal([1,1,1,1,1,1])
+M = A + D
+println(M)
+kx = [1.0,2.0,3.0,4.0,5.0,6.0]
+#println(k1)
+
+function x_g(M::Int)::Vector{Float64}
+    # returns a vector of size M for graphing
+    g = Vector{Float64}(1:M)
+    return (g .- 0.5) ./ Float64(M)
+end
+function x_i(n::Int)::Vector{Float64}
+    # returns a vector of size n for basis, equally spaced between 0 and 1
+    # including 0 and 1
+    return Vector{Float64}(0:n-1) ./ Float64(n-1)
+end
+
+function generate_lagrange_basis_vector_func(x::Vector{Float64})
+    n = size(x)[1]
+    function basis_k(x_interp::Float64, x_data::Vector{Float64}, k::Int)::Float64
+        non_k_indices = cat(1:(k-1), (k+1):n, dims=[1]) # dims = [n-1]
+        x_data_not_k = x_data[non_k_indices] # dims = [n-1]
+        numerators = x_interp .- x_data_not_k # dims = [n-1]
+        denominators = x_data[k] .- x_data_not_k # dims = [n-1]
+        fractions = numerators ./ denominators # dims = [n-1]
+        product = prod(fractions) # dims = [1]
+        return product
+    end
+    # dims = [n]
+    # if confused about why we have (x, )
+    # see https://discourse.julialang.org/t/how-to-broadcast-over-only-certain-function-arguments/19274
+    basis_vector_func = (x_interp::Float64 -> basis_k.(x_interp, (x,), 1:n))
+    return basis_vector_func
+end
+
+function validate(M, kx)
+    p = plot(title="Question 2")
+    for i in 1:length(kx)
+        ky = M[i,:]
+        println(ky)
+        coeffs = get_triangle_poly_coefs(construct_triangle(kx/6.0, ky))
+        x = x_i(6)
+        x_g_vec = x_g(100) # 100 equally spaced points between 0 and 1 for graphing
+        x_basis_vec = x_i(6) # 6 points between 0 and 1 for basis
+        #println(x_g_vec)
+        println(i, " ", x_basis_vec)
+        #println(coeffs)
+        # function that returns 6 values for a scalar input
+        #basis_vec_f = generate_lagrange_basis_vector_func(x_basis_vec)
+        # should see a [100, 6] output, which is 6 output for each input value
+        out = horners_method_vector(x_basis_vec, coeffs, x_g_vec)
+        plot!(x_g_vec, out, legend=:bottomright, xaxis=L"x", yaxis=L"f(x)")
+    end
+    display(p)
+end
+
+validate(M, kx)
