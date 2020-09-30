@@ -24,9 +24,10 @@ md"## 1. Code: Splines"
 
 # ╔═╡ 466438fa-0265-11eb-133c-4d7f9bfe66cb
 function cubic_splines(inter_points, method, slopes=nothing)
-	n = length(inter_points)
-	xs = [x[1] for x in inter_points]
-	ys = [y[2] for y in inter_points]
+	n, _ = size(inter_points)
+	
+	xs = inter_points[:, 1]
+	ys = inter_points[:, 2]
 	
 	
 	matrix = zeros(n, n)
@@ -159,13 +160,13 @@ function f_double_prime(x)
 	(6 .*x) .- 10
 end
 
-# ╔═╡ 01e53634-0279-11eb-305a-850dc557fdd4
-function fx_values_1to6()
-	points = []
-	for i in 1:6
-		push!(points, (i, f(i)))
-	end
-	return points
+# ╔═╡ 972b32e2-032e-11eb-341b-29ec1cd8c44c
+function fx_values_1ton(n::Int, func)
+    # assumes func takes in a scalar and returns a scalar
+    # returns a matrix of dimension [n, 2]
+    x_vals = Vector(1:n)
+    y_vals = func.(x_vals)
+    return [x_vals y_vals]
 end
 
 # ╔═╡ e2be020a-029f-11eb-1701-d908a28f6fc8
@@ -175,7 +176,7 @@ md"## 3. Validation"
 md"Here we can see that our cubic spline, $y_{spline}(x)$, completely overlaps our oringial function $f(x)$ when using the curvature adjusted boundary conditions."
 
 # ╔═╡ 3eca0b2e-0279-11eb-1094-3d64078f9a70
-spline_adjusted = cubic_splines(fx_values_1to6(), adjusted, (f_double_prime(1), f_double_prime(6)))
+spline_adjusted = cubic_splines(fx_values_1ton(6, f), adjusted, (f_double_prime(1), f_double_prime(6)))
 
 # ╔═╡ c72c98fc-0278-11eb-29bb-c502157ec6cc
 begin 
@@ -194,16 +195,16 @@ md"## 4. Invalidation?"
 md"From the following two plots, $y_{spline}(x)$ vs. $f(x)$ and $y_{spline}(x) - f(x)$ vs. $x$, we can see that all methods are relatively close to the original function. However, from the error plot it is clear that the natural, clamped, and parabolically terminated boundry conditions do not perform as well as the curvature-adjusted and not-a-knot boundary conditions."
 
 # ╔═╡ 01cac6da-0299-11eb-16cb-3d878730be0d
-spline_natural = cubic_splines(fx_values_1to6(), natural)
+spline_natural = cubic_splines(fx_values_1ton(6, f), natural)
 
 # ╔═╡ f7298d78-0299-11eb-286e-cb9a696f7c86
-spline_clamped = cubic_splines(fx_values_1to6(), clamped, (f_prime(1), f_prime(6)))
+spline_clamped = cubic_splines(fx_values_1ton(6, f), clamped, (f_prime(1), f_prime(6)))
 
 # ╔═╡ 411e3d42-029b-11eb-0072-6bfc707542e5
-spline_paraterm = cubic_splines(fx_values_1to6(), paraterm)
+spline_paraterm = cubic_splines(fx_values_1ton(6, f), paraterm)
 
 # ╔═╡ 49c84f8c-029b-11eb-2d46-995485ff671d
-spline_notaknot = cubic_splines(fx_values_1to6(), notaknot)
+spline_notaknot = cubic_splines(fx_values_1ton(6, f), notaknot)
 
 # ╔═╡ 487d62b4-02a2-11eb-1815-2b292c34895f
 begin 
@@ -250,10 +251,10 @@ end
 # ╟─200d10d6-02d4-11eb-12d7-3726c7ccebd5
 # ╟─89552580-02cd-11eb-0cc7-556463df92e2
 # ╟─ed67cc88-029d-11eb-0c98-8fceab493fd7
-# ╟─ea0b4254-0278-11eb-3f56-2b4f0f42ab8f
-# ╟─b03a9824-029e-11eb-1199-5dbc03aa75be
-# ╟─d760634a-029e-11eb-23eb-097475fa236a
-# ╟─01e53634-0279-11eb-305a-850dc557fdd4
+# ╠═ea0b4254-0278-11eb-3f56-2b4f0f42ab8f
+# ╠═b03a9824-029e-11eb-1199-5dbc03aa75be
+# ╠═d760634a-029e-11eb-23eb-097475fa236a
+# ╠═972b32e2-032e-11eb-341b-29ec1cd8c44c
 # ╟─e2be020a-029f-11eb-1701-d908a28f6fc8
 # ╟─35364848-02a1-11eb-124b-a14c5bc1e3f7
 # ╠═3eca0b2e-0279-11eb-1094-3d64078f9a70
