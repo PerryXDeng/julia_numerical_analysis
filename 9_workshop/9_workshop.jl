@@ -7,6 +7,9 @@ using InteractiveUtils
 # ╔═╡ fd505a66-0284-11eb-18f2-bd1700f88af0
 md"# Workshop 9"
 
+# ╔═╡ 5980a6fc-02d4-11eb-1d2d-0336c110d4e0
+md"Owen Miller, Perry Deng, Clarrisa Xue"
+
 # ╔═╡ 52d73384-027a-11eb-1df0-bbed88425c06
 @enum Methods begin
 	natural
@@ -108,6 +111,33 @@ function cubic_splines(inter_points, method, slopes=nothing)
 	return outputs
 end
 
+# ╔═╡ 9b1d43d0-02cb-11eb-3dc4-a39dd04c9c49
+md"## 2. Algebra"
+
+# ╔═╡ ae67050c-02cb-11eb-3dce-938a40893abc
+md"$$\int_{x_{j}}^{x_{j+1}}y_{spline}(x)dx = \int_{x_{j}}^{x_{j+1}}Ay_{j}dx + \int_{x_{j}}^{x_{j+1}}By_{j+1}dx + \int_{x_{j}}^{x_{j+1}}Cy''_{j}dx + \int_{x_{j}}^{x_{j+1}}Dy''_{j+1}dx$$
+After splitting the integral apart we can solve each piece:
+
+"
+
+# ╔═╡ 7ee3a0e0-02cd-11eb-0458-a7cf46c0f4ae
+md"$$\int_{x_{j}}^{x_{j+1}}Ay_{j}dx = \int_{x_{j}}^{x_{j+1}}\left(\frac{x_{j+1}-x}{x_{j+1} - x_j}\right)y_{j}dx = y_j\left(\frac{x_{j+1}-x_j}{2}\right)$$"
+
+# ╔═╡ 8ec9c734-02cd-11eb-0387-4f6dcb4a6e49
+md"$$\int_{x_{j}}^{x_{j+1}}By_{j+1}dx = \int_{x_{j}}^{x_{j+1}}(1-A)y_{j+1}dx = y_{j+1}\left(\frac{x_{j+1}-x_j}{2}\right)$$"
+
+# ╔═╡ 80a1f8fc-02d0-11eb-2046-cbeaca8df073
+md"$\int_{x_{j}}^{x_{j+1}}Cy''_{j}dx = \frac{y''_j(x_{j+1} - x_j)^2}{6}\int_{x_{j}}^{x_{j+1}}(A^3 - A)dx = y''_j\left(\frac{(x_{j+1}-x_j)^3}{24}\right)$"
+
+# ╔═╡ abcc0d6a-02d3-11eb-0aa8-29d483bce6dd
+md"$\int_{x_{j}}^{x_{j+1}}Dy''_{j+1}dx = \frac{y''_{j+1}(x_{j+1} - x_j)^2}{6}\int_{x_{j}}^{x_{j+1}}(B^3 - B)dx = y_{j+1}\left(\frac{-(x_{j+1}-x_j)^3}{8}\right)$"
+
+# ╔═╡ 200d10d6-02d4-11eb-12d7-3726c7ccebd5
+md"$\int_{x_{j}}^{x_{j+1}}y_{spline}(x)dx = y_j\left(\frac{x_{j+1}-x_j}{2}\right) + y_{j+1}\left(\frac{x_{j+1}-x_j}{2}\right) + y''_j\left(\frac{(x_{j+1}-x_j)^3}{24}\right) + y_{j+1}\left(\frac{-(x_{j+1}-x_j)^3}{8}\right)$"
+
+# ╔═╡ 89552580-02cd-11eb-0cc7-556463df92e2
+md"---"
+
 # ╔═╡ ed67cc88-029d-11eb-0c98-8fceab493fd7
 md"### Function $f(x)$ and It's Derivatives 
 $f(x) = x^3 - 5x^2 + 6x -1$
@@ -205,23 +235,20 @@ begin
 	end
 end
 
-# ╔═╡ 90b43690-026e-11eb-0c1d-0dcdc65b929f
-md"### ---- Testing ----"
-
-# ╔═╡ cb08577a-026b-11eb-02af-c330d801b36f
-A = [1 1 0; -1 1 0; 0 0 -0.5]
-
-# ╔═╡ 5ef43404-026c-11eb-296d-3b1fb87305f1
-B = [1 1 1]'
-
-# ╔═╡ c55cece6-026e-11eb-2339-0b96e48aac3a
-x = B \ A
-
 # ╔═╡ Cell order:
 # ╟─fd505a66-0284-11eb-18f2-bd1700f88af0
+# ╟─5980a6fc-02d4-11eb-1d2d-0336c110d4e0
 # ╠═52d73384-027a-11eb-1df0-bbed88425c06
 # ╟─4fe4b6f8-02a0-11eb-0d56-5d561455730e
 # ╠═466438fa-0265-11eb-133c-4d7f9bfe66cb
+# ╟─9b1d43d0-02cb-11eb-3dc4-a39dd04c9c49
+# ╟─ae67050c-02cb-11eb-3dce-938a40893abc
+# ╟─7ee3a0e0-02cd-11eb-0458-a7cf46c0f4ae
+# ╟─8ec9c734-02cd-11eb-0387-4f6dcb4a6e49
+# ╟─80a1f8fc-02d0-11eb-2046-cbeaca8df073
+# ╟─abcc0d6a-02d3-11eb-0aa8-29d483bce6dd
+# ╟─200d10d6-02d4-11eb-12d7-3726c7ccebd5
+# ╟─89552580-02cd-11eb-0cc7-556463df92e2
 # ╟─ed67cc88-029d-11eb-0c98-8fceab493fd7
 # ╟─ea0b4254-0278-11eb-3f56-2b4f0f42ab8f
 # ╟─b03a9824-029e-11eb-1199-5dbc03aa75be
@@ -239,7 +266,3 @@ x = B \ A
 # ╠═49c84f8c-029b-11eb-2d46-995485ff671d
 # ╠═487d62b4-02a2-11eb-1815-2b292c34895f
 # ╠═27d494f2-029c-11eb-282d-1f99d853604d
-# ╟─90b43690-026e-11eb-0c1d-0dcdc65b929f
-# ╠═cb08577a-026b-11eb-02af-c330d801b36f
-# ╠═5ef43404-026c-11eb-296d-3b1fb87305f1
-# ╠═c55cece6-026e-11eb-2339-0b96e48aac3a
